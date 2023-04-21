@@ -164,6 +164,17 @@ class DeAn_controller:
 
 # Controller: Tài chính
 
+# Controller: Quản lý trực tiếp
+class QLTructiep_controller:
+    def pc_list(self):
+        result = execute_query(
+            login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.PHANCONG_QLTRUCTIEP')
+        return result
+
+    def nv_list(self):
+        result = execute_query(
+            login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.NHANVIEN_QLTRUCTIEP')
+        return result
 
 #################################################################
 
@@ -191,7 +202,7 @@ def MessageBoxWarn(title, message):
 
 def execute_query(username, password, queryString):
     try:
-        con = cx_Oracle.connect(username, password, 'localhost:1521/ORCLPDB')
+        con = cx_Oracle.connect(username, password, 'localhost:1521/XEPDB1')
 
     except cx_Oracle.DatabaseError as er:
         print('There is an error in the Oracle database:', er)
@@ -202,6 +213,7 @@ def execute_query(username, password, queryString):
 
             # fetchall() is used to fetch all records from result set
             cur.execute(queryString)
+            con.commit()
             rows = cur.fetchall()
             if cur:
                 cur.close()
@@ -222,7 +234,7 @@ def execute_query(username, password, queryString):
 
 def connection2(username, password):
     try:
-        con = cx_Oracle.connect(username, password, 'localhost:1521/ORCLPDB')
+        con = cx_Oracle.connect(username, password, 'localhost:1521/XEPDB1')
         return con
 
     except cx_Oracle.DatabaseError as er:
@@ -303,9 +315,9 @@ class LoginWindow:
                 truongphong.Load_Data()
                 truongphong.showWindow()
             elif login_info[2] == 'QLTRUCTIEP':
-                # global truongphong
-                # truongphong.Load_Data()
-                # truongphong.showWindow()
+                global qltructiep
+                qltructiep.Load_Data()
+                qltructiep.showWindow()
                 print("Comming soon")
             elif login_info[2] == 'TAICHINH':
                 global taichinh_windown
@@ -2115,6 +2127,136 @@ class update_dean:
     def showWindow(self):
         self.main_window.show()
 
+# View: Quản lý trực tiếp
+class Role_QLTructiep:
+    def Load_Data(self):
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Menu')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+
+        # Hiện thị danh sách user
+        self.button_user = QtWidgets.QPushButton(
+            'PHANCONG', self.main_window)
+        self.button_user.move(120, 120)
+        self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_user.clicked.connect(self.on_click_pc)
+
+        # Hiện thị danh sách role
+        self.button_role = QtWidgets.QPushButton(
+            'NHANVIEN', self.main_window)
+        self.button_role.move(340, 120)
+        self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_role.clicked.connect(self.on_click_nv)
+
+    def on_click_pc(self):
+        global pc_window
+        pc_window.PHANCONG_view()
+        pc_window.showWindow()
+
+    def on_click_nv(self):
+        global pc_window2
+        pc_window2.NHANVIEN_view()
+        pc_window2.showWindow()
+
+    def showWindow(self):
+        self.main_window.show()
+
+
+class QL_Phancongview:
+    def PHANCONG_view(self):
+        self.pc_controller = QLTructiep_controller()
+        self.pc_list = self.pc_controller.pc_list()
+        self.main_window = QtWidgets.QMainWindow()
+        self.main_window.setWindowTitle('Danh sách phân công')
+
+        self.table_widget = QtWidgets.QTableWidget()
+        self.table_widget.setColumnCount(3)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['Mã nhân viên', 'Mã đề án', 'Thời gian'])
+
+        # self.table_widget.selectionModel().selectionChanged.connect(self.on_sel)
+        for pc in self.pc_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(pc[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(pc[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(pc[2])))
+
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFixedWidth(420)
+        self.scroll_area.setFixedHeight(250)
+        self.scroll_area.setWidget(self.table_widget)
+        self.main_window.setCentralWidget(self.scroll_area)
+
+        self.main_window.resize(700, 520)
+
+    def showWindow(self):
+        self.main_window.show()
+
+
+class QL_Nhanvienview:
+    def NHANVIEN_view(self):
+        self.nv_controller = QLTructiep_controller()
+        self.nv_list = self.nv_controller.nv_list()
+        self.main_window = QtWidgets.QMainWindow()
+        self.main_window.setWindowTitle('Danh sách nhân viên')
+
+
+        self.table_widget = QtWidgets.QTableWidget()
+        self.table_widget.setColumnCount(11)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['Mã nhân viên', 'Tên nhân viên', 'Phái', 'Ngày sinh', 'Địa chỉ', 'SĐT', 'Lương', 'Phụ cấp', 'Vai trò', 'Mã NQL', 'Trưởng phòng'])
+
+        # self.table_widget.selectionModel().selectionChanged.connect(self.on_sel)
+        for nv in self.nv_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(nv[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(nv[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(nv[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(nv[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(nv[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(nv[5])))
+            self.table_widget.setItem(
+                row_position, 6, QtWidgets.QTableWidgetItem(str(nv[6])))
+            self.table_widget.setItem(
+                row_position, 7, QtWidgets.QTableWidgetItem(str(nv[7])))
+            self.table_widget.setItem(
+                row_position, 8, QtWidgets.QTableWidgetItem(str(nv[8])))
+            self.table_widget.setItem(
+                row_position, 9, QtWidgets.QTableWidgetItem(str(nv[9])))
+            self.table_widget.setItem(
+                row_position, 10, QtWidgets.QTableWidgetItem(str(nv[10])))
+
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFixedWidth(800)
+        self.scroll_area.setFixedHeight(400)
+        self.scroll_area.setWidget(self.table_widget)
+        self.main_window.setCentralWidget(self.scroll_area)
+
+        self.main_window.resize(1080, 720)
+
+    def showWindow(self):
+        self.main_window.show()
 
 #################################################################
 
@@ -2147,6 +2289,10 @@ taichinh_windown = Taichinh_view()
 window_taichinh_ThongTinNhanVien = TaiChinh_ThongTinNhanVien()
 window_TaiChinh_DanhSachPhanCong = TaiChinh_DanhSachPhanCong()
 
+# Quản lý trực tiếp
+qltructiep = Role_QLTructiep()
+pc_window = QL_Phancongview()
+pc_window2 = QL_Nhanvienview()
 login_info = []
 
 
@@ -2154,17 +2300,17 @@ login_info = []
 
 
 def main():
-    # lib_dir = r"C:\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
-    # lib_dir = "C:\oclient\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
-    # global oracle_client_initialized
-    # oracle_client_initialized = False
-    # if not oracle_client_initialized:
-    #     try:
-    #         cx_Oracle.init_oracle_client(lib_dir=lib_dir)
-    #         oracle_client_initialized = True
-    #     except Exception as err:
-    #         print("Error initializing Oracle Client:", err)
-    #         sys.exit(1)
+    lib_dir = r"C:\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
+    lib_dir = "C:\oclient\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
+    global oracle_client_initialized
+    oracle_client_initialized = False
+    if not oracle_client_initialized:
+        try:
+            cx_Oracle.init_oracle_client(lib_dir=lib_dir)
+            oracle_client_initialized = True
+        except Exception as err:
+            print("Error initializing Oracle Client:", err)
+            sys.exit(1)
     app = QtWidgets.QApplication(sys.argv)
     global login_window
     login_window.Load_Data()
