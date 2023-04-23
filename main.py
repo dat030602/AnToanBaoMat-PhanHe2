@@ -41,37 +41,37 @@ class LoginController:
 class AssignmentList_Controller:
     def get_staff_list(self):
         result = execute_query(
-            login_info[0], login_info[1], 'select MANV, TENNV from SYS.NHANVIEN')
+            login_info[0], login_info[1], 'select MANV, TENNV from NVQUANTRI.UV_NHANVIENPHONGBAN')
         return result
 
     def get_staff_ass(self):
         result = execute_query(
-            login_info[0], login_info[1], 'select manv,tennv, mada, tenda from sys.nhanvien, sys.dean')
+            login_info[0], login_info[1], 'select manv,tennv, mada, tenda from NVQUANTRI.UV_NHANVIENPHONGBAN, NVQUANTRI.UV_DEANPHONGBAN')
         return result
 
     def get_assignment_list(self):
         result = execute_query(
-            login_info[0], login_info[1], 'select NV.MANV, NV.TENNV, DA.MADA, DA.TENDA, DA.NGAYBD, PC.THOIGIAN, PB.TENPB, PB.MAPB from SYS.PHANCONG PC JOIN SYS.DEAN DA ON PC.MADA=DA.MADA JOIN SYS.NHANVIEN NV ON NV.MANV=PC.MANV JOIN SYS.PHONGBAN PB ON PB.MAPB=DA.PHONG')
+            login_info[0], login_info[1], 'select NV.MANV, NV.TENNV, DA.MADA, DA.TENDA, DA.NGAYBD, PC.THOIGIAN, PB.TENPB, PB.MAPB from NVQUANTRI.UV_PHANCONGPHONGBAN PC join NVQUANTRI.UV_DEANPHONGBAN DA ON PC.MADA=DA.MADA join NVQUANTRI.UV_NHANVIENPHONGBAN NV ON PC.MANV=NV.MANV join NVQUANTRI.UV_PHONGBANPHONGBAN PB ON DA.PHONG = PB.MAPB')
         return result
 
     def Delete_Staff(self, MANV, MADA):
         result = execute_query(
-            login_info[0], login_info[1], f"DELETE FROM SYS.PHANCONG WHERE MANV='{MANV}' AND MADA='{MADA}'")
+            login_info[0], login_info[1], f"DELETE FROM NVQUANTRI.UV_PHANCONGPHONGBAN WHERE MANV='{MANV}' AND MADA='{MADA}'")
         return result
 
     def Delete_Assignment(self, MADA):
         result = execute_query(
-            login_info[0], login_info[1], f"DELETE FROM SYS.PHANCONG WHERE MADA='{MADA}'")
+            login_info[0], login_info[1], f"DELETE FROM NVQUANTRI.UV_PHANCONGPHONGBAN WHERE MADA='{MADA}'")
         return result
 
     def Update_Assignment(self, THOIGIAN, MANV, MADA):
         result = execute_query(
-            login_info[0], login_info[1], f"UPDATE SYS.PHANCONG SET THOIGIAN = '{THOIGIAN}' WHERE MANV='{MANV}' AND MADA='{MADA}'")
+            login_info[0], login_info[1], f"UPDATE NVQUANTRI.UV_PHANCONGPHONGBAN SET THOIGIAN = '{THOIGIAN}' WHERE MANV='{MANV}' AND MADA='{MADA}'")
         return result
 
     def InsertStaff(self, MANV, MADA):
         result = execute_query(
-            login_info[0], login_info[1], f"INSERT INTO SYS.PHANCONG VALUES ('{MANV}', '{MADA}', NULL)")
+            login_info[0], login_info[1], f"INSERT INTO NVQUANTRI.UV_PHANCONGPHONGBAN VALUES ('{MANV}', '{MADA}', NULL)")
         return result
 
 
@@ -79,10 +79,10 @@ class TruongPhong_ListStaff_Controller:
     def get_staff_list(self, text):
         if (text != ""):
             result = execute_query(
-                login_info[0], login_info[1], "select MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG from SYS.NHANVIEN where MANV like '%{0}' or MANV like '{0}%' or MANV like '%{1}' or MANV like '{1}%' or TENNV like '%{0}' or TENNV like '{0}%' or TENNV like '%{1}' or TENNV like '{1}%'".format(text, text.upper()))
+                login_info[0], login_info[1], "select MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG from NVQUANTRI.UV_NHANVIENPHONGBAN where MANV like '%{0}' or MANV like '{0}%' or MANV like '%{1}' or MANV like '{1}%' or TENNV like '%{0}' or TENNV like '{0}%' or TENNV like '%{1}' or TENNV like '{1}%'".format(text, text.upper()))
         else:
             result = execute_query(
-                login_info[0], login_info[1], 'select MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG from SYS.NHANVIEN')
+                login_info[0], login_info[1], 'select MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG from NVQUANTRI.UV_NHANVIENPHONGBAN')
         return result
 
 
