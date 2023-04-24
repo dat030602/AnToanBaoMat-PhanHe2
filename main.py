@@ -676,13 +676,13 @@ class Role_TruongPhong:
         self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
 
         # Đăng xuất
-        self.button_user = QtWidgets.QPushButton(
+        self.button_logout = QtWidgets.QPushButton(
             'Đăng xuất', self.main_window)
-        self.button_user.move(590, 470)
-        self.button_user.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.button_user.clicked.connect(self.Logout)
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
 
     def on_click_TruongPhong_ListStaff(self):
         truongphong.closeWindow()
@@ -1466,6 +1466,15 @@ class Role_Nhan_su:
         self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_role.clicked.connect(self.on_click_nv)
 
+        # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
+
     def on_click_pb(self):
         global pb_window
         pb_window.PHONGBAN_view()
@@ -1951,6 +1960,15 @@ class Taichinh_view:
             QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_assign.clicked.connect(self.clicked_assign)
 
+        # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
+
     def clicked_staff(self):
         taichinh_window.closeWindow()
         global window_taichinh_ThongTinNhanVien
@@ -2159,6 +2177,15 @@ class DeAn_view:
         # thiết lập hover cursor
         self.button_assign.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
+        # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
 
     def clicked_scheme(self):
         dean_window.closeWindow()
@@ -2448,6 +2475,15 @@ class Role_QLTructiep:
         self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_role.clicked.connect(self.on_click_nv)
 
+        # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
+
     def on_click_pc(self):
         global pc_window
         pc_window.PHANCONG_view()
@@ -2625,6 +2661,15 @@ class DBA_MainWindown:
         self.button_table.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_table.clicked.connect(self.on_click_table)
+
+        # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_logout.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_logout.clicked.connect(self.Logout)
 
     def on_click_user(self):
         dba_main_window.closeWindow()
