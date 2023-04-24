@@ -367,9 +367,6 @@ def MessageBoxWarn(title, message):
     messagebox.showwarning(title, message)
 
 
-def Logout():
-    print("Logout")
-
 #################################################################
 
 
@@ -512,6 +509,8 @@ class LoginWindow:
                 global dean_window
                 dean_window.Load_Data()
                 dean_window.showWindow()
+            self.username_input.setText('')
+            self.password_input.setText('')
         else:
             MessageBoxErr("Dang nhap", "That Bai")
 
@@ -683,7 +682,7 @@ class Role_TruongPhong:
         self.button_user.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        # self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
+        self.button_user.clicked.connect(self.Logout)
 
     def on_click_TruongPhong_ListStaff(self):
         truongphong.closeWindow()
@@ -702,6 +701,19 @@ class Role_TruongPhong:
 
     def showWindow(self):
         self.main_window.show()
+
+    def Logout(self):
+        # Trưởng phòng
+        global truongphong
+        truongphong.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
 
 
 class AssignmentList_View:
@@ -1467,6 +1479,22 @@ class Role_Nhan_su:
     def showWindow(self):
         self.main_window.show()
 
+    def closeWindow(self):
+        self.main_window.close()
+
+    def Logout(self):
+        # Nhân sự
+        global nhansu
+        nhansu.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
+
 
 class Phongbanview:
     def PHONGBAN_view(self):
@@ -1941,6 +1969,20 @@ class Taichinh_view:
     def showWindow(self):
         self.main_window.show()
 
+    def Logout(self):
+
+        # Tài chính
+        global taichinh_window
+        taichinh_window.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
+
 
 class TaiChinh_ThongTinNhanVien:
     def Load_Data(self):
@@ -2129,6 +2171,19 @@ class DeAn_view:
 
     def showWindow(self):
         self.main_window.show()
+
+    def Logout(self):
+        # Đề án
+        global dean_window
+        dean_window.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
 
 
 class DanhSachDeAn_view:
@@ -2406,6 +2461,22 @@ class Role_QLTructiep:
     def showWindow(self):
         self.main_window.show()
 
+    def closeWindow(self):
+        self.main_window.close()
+
+    def Logout(self):
+        # Quản lý trực tiếp
+        global qltructiep
+        qltructiep.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
+
 
 class QL_Phancongview:
     def PHANCONG_view(self):
@@ -2590,6 +2661,19 @@ class DBA_MainWindown:
 
     def showWindow(self):
         self.main_window.show()
+
+    def Logout(self):
+        # DBA
+        global dba_main_window
+        dba_main_window.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
 
 
 class DBA_PriView:

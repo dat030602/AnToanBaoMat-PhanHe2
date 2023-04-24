@@ -16,6 +16,7 @@ GRANT CREATE ANY VIEW TO NVQUANTRI WITH ADMIN OPTION;
 GRANT DBA TO NVQUANTRI WITH ADMIN OPTION;
 
 ------------------------------------------------------------------------------
+CONNECT NVQuanTri/a;
 
 alter table NHANVIEN drop constraint FK_NHANVIEN_MANQL;
 alter table NHANVIEN drop constraint FK_NHANVIEN_PHG;
@@ -191,8 +192,9 @@ END;
 EXEC USP_CREATE_USER;
 /
 ------------------------------------------------------------------------------
-
 --Role: Truong phong
+
+
 --drop USER NVTruongPhong;
 --drop ROLE TRUONGPHONG;
 CREATE USER NVTruongPhong IDENTIFIED BY a;
@@ -231,6 +233,8 @@ GRANT CONNECT TO TRUONGPHONG;
 GRANT TRUONGPHONG TO NVTruongPhong;
 
 ------------------------------------------------------------------------------
+--Role: Nhan Su
+
 
 create role NHANSU;
 grant select, insert, update on nvquantri.PHONGBAN to NHANSU;
@@ -244,11 +248,13 @@ grant update(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANT
 grant insert(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANTRI.NHANVIEN TO NHANSU;
 
 ------------------------------------------------------------------------------
-
+--GRANT QUYEN
 CREATE OR REPLACE PROCEDURE USP_GRANT_PRIVS
 AS
     CURSOR CUR IS (SELECT USERNAME
-                    FROM NHANVIEN);
+                    FROM NHANVIEN
+                    WHERE USERNAME IN(SELECT USERNAME
+                                        FROM ALL_USERS));
     strSQL VARCHAR(2000);
     CK_USER INT;
     Usr varchar2(30);
@@ -274,6 +280,9 @@ BEGIN
         
         EXECUTE IMMEDIATE(strSQL);
         
+        strSQL := 'GRANT NHANVIEN TO '|| Usr;
+        EXECUTE IMMEDIATE(strSQL);
+
     END LOOP;
 END;
 /
