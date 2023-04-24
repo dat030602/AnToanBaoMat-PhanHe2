@@ -367,6 +367,9 @@ def MessageBoxWarn(title, message):
     messagebox.showwarning(title, message)
 
 
+def Logout():
+    print("Logout")
+
 #################################################################
 
 
@@ -646,14 +649,14 @@ class Role_TruongPhong:
         # Thiết lập kích thước cho widget
         self.main_window.resize(700, 520)
 
-        # Hiện thị Danh sách nhân viên của phòng
+        # Hiện thị Thông tin cá nhân
         self.button_user = QtWidgets.QPushButton(
-            'Danh sách nhân viên của phòng', self.main_window)
+            'Thông tin cá nhân', self.main_window)
         self.button_user.move(120, 120)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
+        # self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
 
         # Hiện thị Danh sách các phân công
         self.button_role = QtWidgets.QPushButton(
@@ -663,6 +666,24 @@ class Role_TruongPhong:
         # thiết lập hover cursor
         self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_role.clicked.connect(self.on_click_assignment_list)
+
+        # Hiện thị Danh sách nhân viên của phòng
+        self.button_user = QtWidgets.QPushButton(
+            'Danh sách nhân viên của phòng', self.main_window)
+        self.button_user.move(120, 220)
+        self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
+
+        # Đăng xuất
+        self.button_user = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_user.move(590, 470)
+        self.button_user.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        # self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
 
     def on_click_TruongPhong_ListStaff(self):
         truongphong.closeWindow()
