@@ -192,14 +192,23 @@ class LoginController:
 
         result = execute_query(username_text, password_text,
                                "select GRANTED_ROLE from USER_ROLE_PRIVS WHERE GRANTED_ROLE NOT IN(select GRANTED_ROLE from ROLE_ROLE_PRIVS)")
-        print(result)
 
         if result:
             global login_info
             if ("DBA",) in result:
                 login_info = [username_text, password_text, "DBA"]
-            else:
-                login_info = [username_text, password_text, result[0][0]]
+            elif ("NHANSU",) in result:
+                login_info = [username_text, password_text, "NHANSU"]
+            elif ("QLTRUCTIEP",) in result:
+                login_info = [username_text, password_text, "QLTRUCTIEP"]
+            elif ("TRUONGPHONG",) in result:
+                login_info = [username_text, password_text, "TRUONGPHONG"]
+            elif ("TAICHINH",) in result:
+                login_info = [username_text, password_text, "TAICHINH"]
+            elif ("TRUONGDEAN",) in result:
+                login_info = [username_text, password_text, "TRUONGDEAN"]
+            elif ("NHANVIEN",) in result:
+                login_info = [username_text, password_text, "NHANVIEN"]
         print(login_info)
         return result
 
@@ -552,7 +561,7 @@ class LoginWindow:
         self.btn_login.clicked.connect(self.clicked_login)
         self.btn_login.move(300, 190)
         # thiết lập hover cursor
-        self.btn_login.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
     def clicked_login(self):
         self.user_name_text = self.username_input.text()
@@ -589,6 +598,10 @@ class LoginWindow:
                 global dean_window
                 dean_window.Load_Data()
                 dean_window.showWindow()
+            elif login_info[2] == 'NHANVIEN':
+                global Nhanvien_windown
+                Nhanvien_windown.Load_Data()
+                Nhanvien_windown.showWindow()
             self.username_input.setText('')
             self.password_input.setText('')
         else:
@@ -671,7 +684,6 @@ class ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_back.setText("THÊM")
         self.btn_back.move(480, 100)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         # self.btn_back.clicked.connect(self.Backmenu)
 
         # Thiết lập button xóa đề án
@@ -680,7 +692,6 @@ class ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_back.setText("XÓA")
         self.btn_back.move(480, 160)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         # self.btn_back.clicked.connect(self.Backmenu)
 
         # Thiết lập button sửa đề án
@@ -689,7 +700,6 @@ class ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_back.setText("CHỈNH SỬA")
         self.btn_back.move(480, 220)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         # self.btn_back.clicked.connect(self.Backmenu)
 
         # Thiết lập button back
@@ -698,7 +708,6 @@ class ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def closeWindow(self):
@@ -729,13 +738,13 @@ class Role_TruongPhong:
         self.main_window.resize(700, 520)
 
         # Hiện thị Thông tin cá nhân
-        self.button_user = QtWidgets.QPushButton(
+        self.button_info = QtWidgets.QPushButton(
             'Thông tin cá nhân', self.main_window)
-        self.button_user.move(120, 120)
-        self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        self.button_info.move(120, 120)
+        self.button_info.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        # self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
+        
+        self.button_info.clicked.connect(self.on_click_ThongTinCaNhan)
 
         # Hiện thị Danh sách các phân công
         self.button_role = QtWidgets.QPushButton(
@@ -743,7 +752,7 @@ class Role_TruongPhong:
         self.button_role.move(340, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_role.clicked.connect(self.on_click_assignment_list)
 
         # Hiện thị Danh sách nhân viên của phòng
@@ -752,7 +761,7 @@ class Role_TruongPhong:
         self.button_user.move(120, 220)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
 
         # Đăng xuất
@@ -761,8 +770,7 @@ class Role_TruongPhong:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_TruongPhong_ListStaff(self):
@@ -776,6 +784,12 @@ class Role_TruongPhong:
         global assignment_list
         assignment_list.Load_Data()
         assignment_list.showWindow()
+
+    def on_click_ThongTinCaNhan(self):
+        truongphong.closeWindow()
+        global window_nhanvien_ThongTinCaNhan
+        window_nhanvien_ThongTinCaNhan.Load_Data()
+        window_nhanvien_ThongTinCaNhan.showWindow()
 
     def closeWindow(self):
         self.main_window.hide()
@@ -974,7 +988,7 @@ class AssignmentList_View:
         self.btn_update.move(360, 465)
 
         # thiết lập hover cursor
-        self.btn_update.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         # Thiết lập button back
         self.btn_back = QtWidgets.QPushButton(self.main_window)
@@ -982,7 +996,6 @@ class AssignmentList_View:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -1425,7 +1438,7 @@ class TruongPhong_ListStaff_View:
         self.btn_search.move(360, 430)
 
         # thiết lập hover cursor
-        self.btn_search.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         # thiết lập button xem tất cả
         self.btn_all = QtWidgets.QPushButton(self.main_window)
@@ -1440,7 +1453,7 @@ class TruongPhong_ListStaff_View:
         self.btn_all.clicked.connect(self.clicked_btn)
         self.btn_all.move(450, 430)
         # thiết lập hover cursor
-        self.btn_all.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         # Thiết lập button back
         self.btn_back = QtWidgets.QPushButton(self.main_window)
@@ -1448,7 +1461,6 @@ class TruongPhong_ListStaff_View:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -1535,7 +1547,7 @@ class Role_Nhan_su:
         self.button_user.move(120, 120)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_user.clicked.connect(self.on_click_pb)
 
         # Hiện thị danh sách role
@@ -1544,7 +1556,7 @@ class Role_Nhan_su:
         self.button_role.move(340, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_role.clicked.connect(self.on_click_nv)
 
         # Đăng xuất
@@ -1553,8 +1565,7 @@ class Role_Nhan_su:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_pb(self):
@@ -1971,8 +1982,6 @@ class NhanVien_view:
         self.button_staff.move(120, 180)
         self.button_staff.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_staff.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_staff.clicked.connect(self.clicked_information)
 
         # Đăng xuất
@@ -1982,8 +1991,6 @@ class NhanVien_view:
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
     def clicked_information(self):
         Nhanvien_windown.closeWindow()
@@ -2070,7 +2077,6 @@ class Nhanvien_ThongTinCaNhan:
         self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_update.setText("UPDATE")
         self.btn_update.move(280, 280)
-        self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.click_update)
 
         # Thiết lập button back
@@ -2079,7 +2085,6 @@ class Nhanvien_ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def closeWindow(self):
@@ -2222,7 +2227,6 @@ class update_thongtincanhan:
         self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_update.setText("UPDATE")
         self.btn_update.move(280, 300)
-        self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.clicked_update)
 
     def clicked_update(self):
@@ -2272,8 +2276,6 @@ class Taichinh_view:
         self.button_staff.move(120, 100)
         self.button_staff.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_staff.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_staff.clicked.connect(self.clicked_staff)
 
         # Hiện thị danh sách thông tin phân công
@@ -2283,8 +2285,6 @@ class Taichinh_view:
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_assign.clicked.connect(self.clicked_infomation)
 
         # Hiện thị danh sách thông tin cá nhân
@@ -2294,8 +2294,6 @@ class Taichinh_view:
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_assign.clicked.connect(self.clicked_Department)
 
         # Hiện thị danh sách phòng ban đề án
@@ -2305,8 +2303,6 @@ class Taichinh_view:
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -2314,8 +2310,7 @@ class Taichinh_view:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def clicked_staff(self):
@@ -2467,7 +2462,6 @@ class TaiChinh_ThongTinNhanVien:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def closeWindow(self):
@@ -2622,7 +2616,6 @@ class TaiChinh_ThongTinCaNhan:
         self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_update.setText("UPDATE")
         self.btn_update.move(280, 280)
-        self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.click_update)
 
         # Thiết lập button back
@@ -2631,7 +2624,6 @@ class TaiChinh_ThongTinCaNhan:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def closeWindow(self):
@@ -2749,7 +2741,6 @@ class TaiChinh_PhongBanDeAn:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def closeWindow(self):
@@ -2845,7 +2836,6 @@ class update_nhanvien:
         self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_update.setText("UPDATE")
         self.btn_update.move(280, 300)
-        self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.clicked_update)
 
     def clicked_update(self):
@@ -2893,8 +2883,6 @@ class DeAn_view:
         self.button_staff.move(120, 180)
         self.button_staff.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_staff.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_staff.clicked.connect(self.clicked_scheme)
 
         # Đăng xuất
@@ -2904,8 +2892,6 @@ class DeAn_view:
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -2913,8 +2899,7 @@ class DeAn_view:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def clicked_scheme(self):
@@ -3027,7 +3012,6 @@ class DanhSachDeAn_view:
         self.btn_add.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_add.setText("THÊM")
         self.btn_add.move(500, 180)
-        self.btn_add.setCursor(Qt.PointingHandCursor)
         self.btn_add.clicked.connect(self.click_add)
 
         # Thiết lập button xóa đề án
@@ -3036,7 +3020,6 @@ class DanhSachDeAn_view:
         self.btn_delete.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_delete.setText("XÓA")
         self.btn_delete.move(500, 240)
-        self.btn_delete.setCursor(Qt.PointingHandCursor)
         self.btn_delete.clicked.connect(self.clicked_delete)
 
         # Thiết lập button sửa đề án
@@ -3045,7 +3028,6 @@ class DanhSachDeAn_view:
         self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
         self.btn_update.setText("CHỈNH SỬA")
         self.btn_update.move(500, 300)
-        self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.click_update)
 
         # Thiết lập button back
@@ -3054,7 +3036,6 @@ class DanhSachDeAn_view:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.Backmenu)
 
     def display_textbox(self, row):
@@ -3193,7 +3174,6 @@ class add_dean:
         self.btn_add.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_add.setText("ADD")
         self.btn_add.move(300, 270)
-        self.btn_add.setCursor(Qt.PointingHandCursor)
         self.btn_add.clicked.connect(self.clicked_add)
 
     def clicked_add(self):
@@ -3312,7 +3292,6 @@ class update_dean:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("Update")
         self.btn_back.move(300, 270)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
         self.btn_back.clicked.connect(self.clicked_update)
 
     def clicked_update(self):
@@ -3362,7 +3341,7 @@ class Role_QLTructiep:
         self.button_user.move(120, 120)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_user.clicked.connect(self.on_click_pc)
 
         # Hiện thị danh sách role
@@ -3371,7 +3350,7 @@ class Role_QLTructiep:
         self.button_role.move(340, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_role.clicked.connect(self.on_click_nv)
 
         # Đăng xuất
@@ -3380,8 +3359,7 @@ class Role_QLTructiep:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_pc(self):
@@ -3520,7 +3498,7 @@ class DBA_MainWindown:
         self.button_user.move(120, 120)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_user.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_user.clicked.connect(self.on_click_user)
 
         # Hiện thị danh sách role
@@ -3529,7 +3507,7 @@ class DBA_MainWindown:
         self.button_role.move(340, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_role.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_role.clicked.connect(self.on_click_role)
 
         # Hiện thị danh sách quyền của role/user
@@ -3539,7 +3517,7 @@ class DBA_MainWindown:
         self.button_pri.setFixedSize(180, 60)  # Thiết lập kích thước cố định
 
         # thiết lập hover cursor
-        self.button_pri.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_pri.clicked.connect(self.on_click_privileges)
 
         # Hiện thị danh sách quyền của role/user
@@ -3554,12 +3532,10 @@ class DBA_MainWindown:
         self.button_pri1.move(120, 320)
         self.button_pri1.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_pri1.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_pri1.clicked.connect(self.on_click_pri)
 
         # thiết lập hover cursor
-        self.button_table.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_table.clicked.connect(self.on_click_table)
 
         # Đăng xuất
@@ -3568,8 +3544,7 @@ class DBA_MainWindown:
         self.button_logout.move(590, 470)
         self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
-        self.button_logout.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_user(self):
@@ -3663,7 +3638,7 @@ class DBA_PriView:
         self.btn_submit.move(570, 60)
 
         # thiết lập hover cursor
-        self.btn_submit.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         self.user_list = self.TableController.display_table_list()
 
@@ -3699,7 +3674,6 @@ class DBA_PriView:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -3945,7 +3919,6 @@ class DBA_RoleView:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -4367,7 +4340,7 @@ class DBA_TableView:
         self.btn_submit.move(570, 110)
 
         # thiết lập hover cursor
-        self.btn_submit.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         self.user_list = self.TableController.display_table_list()
 
@@ -4405,7 +4378,6 @@ class DBA_TableView:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -4684,7 +4656,6 @@ class DBA_UserList:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
@@ -5218,7 +5189,7 @@ class DBA_privilegesView:
         self.btn_search.move(570, 60)
 
         # thiết lập hover cursor
-        self.btn_search.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         # thiết lập button xem tất cả
         self.btn_all = QtWidgets.QPushButton(self.main_window)
@@ -5233,7 +5204,7 @@ class DBA_privilegesView:
         self.btn_all.clicked.connect(self.clicked_btn)
         self.btn_all.move(470, 140)
         # thiết lập hover cursor
-        self.btn_all.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
 
         self.user_list = self.PrivilegesController.get_user_list(
             self.search_text)
@@ -5272,7 +5243,6 @@ class DBA_privilegesView:
         self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_back.setText("BACK")
         self.btn_back.move(610, 470)
-        # # self.btn_back.setCursor(Qt.PointingHandCursor)
 
         self.btn_back.clicked.connect(self.Backmenu)
 
