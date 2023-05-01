@@ -808,8 +808,6 @@ class Role_TruongPhong:
         global login_window
         login_window.showWindow()
 
-        print("Logout")
-
 
 class AssignmentList_View:
     def Load_Data(self):

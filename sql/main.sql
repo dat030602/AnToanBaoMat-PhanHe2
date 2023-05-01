@@ -14,6 +14,7 @@ GRANT DROP ANY ROLE TO NVQuanTri WITH ADMIN OPTION;
 GRANT SELECT ANY DICTIONARY TO NVQuanTri WITH ADMIN OPTION;
 GRANT CREATE ANY VIEW TO NVQUANTRI WITH ADMIN OPTION;
 GRANT DBA TO NVQUANTRI WITH ADMIN OPTION;
+grant execute on sys.dbms_crypto to NVQUANTRI;
 
 ------------------------------------------------------------------------------
 CONNECT NVQuanTri/a;
@@ -38,8 +39,8 @@ create table NHANVIEN
 	NGAYSINH date,
     DIACHI nvarchar2(600),
 	SODT varchar2(20),
-	LUONG number(10),
-	PHUCAP number(10),
+	LUONG varchar2(100),
+	PHUCAP varchar2(100),
     VAITRO nvarchar2(30),
     MANQL varchar2(7),
     PHG varchar2(7),
@@ -84,12 +85,59 @@ alter table PHANCONG add constraint FK_PHANCONG_MANV Foreign key (MANV) referenc
 
 --TRIGGER
 /
-CREATE OR REPLACE TRIGGER TRIGGER_ENCRYPT_SINHVIEN
+CREATE OR REPLACE TRIGGER TRIGGER_UPPER_USERNAME_SINHVIEN
 BEFORE INSERT
-ON NHANVIEN
+ON NHANVIEN 
 FOR EACH ROW
 BEGIN
     :NEW.USERNAME := UPPER(:NEW.USERNAME);
+END;
+/
+--Ma hoa luong
+CREATE OR REPLACE TRIGGER TRIGGER_ENCRYPT_NHANVIEN_LUONG
+BEFORE INSERT OR UPDATE
+ON NHANVIEN
+FOR EACH ROW
+DECLARE
+    encrypted_raw     RAW(2000);
+    raw_key           RAW(2000)        := UTL_RAW.CAST_TO_RAW('rO0ABXVyXvTTaw==');
+BEGIN
+    --luong
+    encrypted_raw := DBMS_CRYPTO.ENCRYPT( src => UTL_RAW.cast_to_raw(:NEW.LUONG),
+                                          typ => DBMS_CRYPTO.DES_CBC_PKCS5,
+                                          key => raw_key);
+    :NEW.LUONG := encrypted_raw;
+END;
+/
+--Ma hoa phu cap
+CREATE OR REPLACE TRIGGER TRIGGER_ENCRYPT_NHANVIEN_PHUCAP
+BEFORE INSERT OR UPDATE
+ON NHANVIEN
+FOR EACH ROW
+DECLARE
+    encrypted_raw     RAW(2000);
+    raw_key           RAW(2000)        := UTL_RAW.CAST_TO_RAW('rO0ABXVyXvTTaw==');
+BEGIN
+    --phucap
+    encrypted_raw := DBMS_CRYPTO.ENCRYPT( src => UTL_RAW.cast_to_raw(:NEW.PHUCAP),
+                                          typ => DBMS_CRYPTO.DES_CBC_PKCS5,
+                                          key => raw_key);
+    :NEW.PHUCAP := encrypted_raw;
+END;
+/
+
+--Giai ma
+CREATE OR REPLACE FUNCTION F_DECRYPT_NHANVIEN(val varchar2)
+RETURN VARCHAR2
+AS
+    decrypted_raw     RAW(2000);
+    raw_key           RAW(2000)        := UTL_RAW.CAST_TO_RAW('rO0ABXVyXvTTaw==');
+BEGIN
+    --decrypted_raw := DBMS_CRYPTO.DECRYPT( src => UTL_RAW.cast_to_raw(val),
+    decrypted_raw := DBMS_CRYPTO.DECRYPT( src => val,
+                                          typ => DBMS_CRYPTO.DES_CBC_PKCS5,
+                                          key => raw_key);
+    return UTL_I18N.RAW_TO_CHAR(decrypted_raw, 'AL32UTF8');
 END;
 /
 
@@ -205,8 +253,8 @@ CREATE ROLE TRUONGPHONG;
 CREATE OR REPLACE VIEW UV_NHANVIENPHONGBAN
 AS
     SELECT NV1.manv, NV1.tennv, NV1.phai, NV1.ngaysinh, NV1.diachi, NV1.sodt,
-        DECODE (NV1.username, SYS_CONTEXT('USERENV','SESSION_USER'), NV1.luong, NULL) luong,
-        DECODE (NV1.username, SYS_CONTEXT('USERENV','SESSION_USER'), NV1.phucap, NULL) phucap,
+        DECODE (NV1.username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(NV1.luong), NULL) luong,
+        DECODE (NV1.username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(NV1.phucap), NULL) phucap,
         NV1.vaitro, NV1.manql, NV1.phg
     FROM NHANVIEN NV1 where NV1.PHG in(
             SELECT NV2.PHG
@@ -242,7 +290,9 @@ create role NHANSU;
 grant select, insert, update on nvquantri.PHONGBAN to NHANSU;
 create or replace view nhanvien_ns
 as
-    select manv, tennv, phai, ngaysinh, diachi, sodt, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), luong, NULL) luong, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), phucap, NULL) phucap, vaitro, manql, phg 
+    select manv, tennv, phai, ngaysinh, diachi, sodt,
+        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong,
+        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
     from nvquantri.nhanvien;
 
 grant select on nvquantri.nhanvien_ns to NHANSU;
@@ -269,7 +319,9 @@ GRANT CREATE VIEW TO nvquantri;
 --DROP VIEW CS_TRUONGDEAN;
 --bang TRUONGDEAN
 CREATE OR REPLACE VIEW CS_TRUONGDEAN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
+        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT,
+            F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP,
+            NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
         FROM nvquantri.NHANVIEN NV 
         INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
         WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))
@@ -293,7 +345,7 @@ GRANT CREATE VIEW TO nvquantri;
 --DROP VIEW CS_NHANVIEN;
 --bang nhanvien
 CREATE OR REPLACE VIEW CS_NHANVIEN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
+        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
         FROM nvquantri.NHANVIEN NV 
         INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
         WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))   
@@ -320,7 +372,9 @@ grant select on nvquantri.PHANCONG to TAICHINH;
 --DROP VIEW CS_NHANVIEN;
 --bang nhanvien
 CREATE OR REPLACE VIEW CS_NHANVIEN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
+        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT,
+            F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP,
+            NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
         FROM nvquantri.NHANVIEN NV 
         INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
         WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))
@@ -338,7 +392,9 @@ grant create session to QLTRUCTIEP;
 --
 create or replace view nhanvien_qltructiep
 as
-    select manv, tennv, phai, ngaysinh, diachi, sodt, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), luong, NULL) luong, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), phucap, NULL) phucap, vaitro, manql, phg 
+    select manv, tennv, phai, ngaysinh, diachi, sodt,
+        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong,
+        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
     from nvquantri.nhanvien nv1
     where nv1.username = SYS_CONTEXT('USERENV','SESSION_USER') or nv1.manql in 
     (select nv2.manv from nvquantri.nhanvien nv2 where nv2.username = SYS_CONTEXT('USERENV','SESSION_USER'));
