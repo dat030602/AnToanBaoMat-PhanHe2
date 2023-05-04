@@ -177,6 +177,11 @@ class User_Controller:
             login_info[0], login_info[1], 'REVOKE {0} FROM {1}'.format(pri_name, user_name))
         return result
 
+class Audit_Controller:
+    def display_user_audit(self, user_name):
+        result = execute_query(
+            login_info[0], login_info[1], 'select action_name, object_name, event_timestamp from unified_audit_trail where dbusername =' + "'{0}' order by event_timestamp desc".format(user_name))
+        return result
 
 # Controller: Login
 
@@ -3536,6 +3541,15 @@ class DBA_MainWindown:
         # thiết lập hover cursor
         self.button_table.clicked.connect(self.on_click_table)
 
+        # Hiện thị danh sách role
+        self.button_audit = QtWidgets.QPushButton(
+            'Auditing', self.main_window)
+        self.button_audit.move(340, 320)
+        self.button_audit.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        
+        self.button_audit.clicked.connect(self.on_click_audit)
+
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
             'Đăng xuất', self.main_window)
@@ -3574,6 +3588,12 @@ class DBA_MainWindown:
         global dba_pri_window
         dba_pri_window.Load_Data()
         dba_pri_window.showWindow()
+
+    def on_click_audit(self):
+        dba_main_window.closeWindow()
+        global dba_audit_window
+        dba_audit_window.Load_Data()
+        dba_audit_window.showWindow()
 
     def closeWindow(self):
         self.main_window.hide()
@@ -5277,6 +5297,86 @@ class DBA_privilegesView:
         dba_main_window.showWindow()
 
 
+class DBA_auditView:
+    def Load_Data(self):
+        self.audit_controller = Audit_Controller()
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Auditing')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+
+        # Thiết lập p hiện thị nhập user
+        self.user_name = QtWidgets.QLabel(self.main_window)
+        self.user_name.setText("Nhập UserName: ")
+        self.user_name.setStyleSheet("font-size: 16px;")
+        self.user_name.adjustSize()
+        self.user_name.move(440, 20)
+
+        # Thiết lập ô nhập input
+        self.search_bar = QtWidgets.QLineEdit(self.main_window)
+        self.search_bar.setPlaceholderText("Search...")
+        self.search_bar.setStyleSheet("QLineEdit { padding-left: 16px; }")
+        self.search_bar.setFixedWidth(160)
+        self.search_bar.setFixedHeight(30)
+        self.search_bar.move(440, 60)
+
+        # Thiết lập button search
+        self.btn_search = QtWidgets.QPushButton(self.main_window)
+        self.btn_search.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_search.setStyleSheet('background-color: #999999; color: #fff')
+        self.btn_search.setText("TÌM")
+        self.btn_search.clicked.connect(self.clicked_search)
+        self.btn_search.move(440, 100)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+
+        self.btn_back.clicked.connect(self.Backmenu)
+
+        self.table_widget = QtWidgets.QTableWidget()
+        self.table_widget.setColumnCount(3)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['Hành động', 'Bảng', 'Thời gian'])
+    
+        self.table_widget.setColumnWidth(2, 250)
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFixedWidth(420)
+        self.scroll_area.setFixedHeight(450)
+        self.scroll_area.setWidget(self.table_widget)
+        self.main_window.setCentralWidget(self.scroll_area)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def clicked_search(self):
+        self.audit_list = self.audit_controller.display_user_audit(self.search_bar.text())
+        self.table_widget.clearContents()
+        self.table_widget.setRowCount(0)
+        #self.table_widget.setRowCount(len(self.audit_list))
+        for user in self.audit_list:
+                row_position = self.table_widget.rowCount()
+                self.table_widget.insertRow(row_position)
+                self.table_widget.setItem(
+                    row_position, 0, QtWidgets.QTableWidgetItem(str(user[0])))
+                self.table_widget.setItem(
+                    row_position, 1, QtWidgets.QTableWidgetItem(str(user[1])))
+                self.table_widget.setItem(
+                    row_position, 2, QtWidgets.QTableWidgetItem(str(user[2])))
+
+    def Backmenu(self):
+        dba_audit_window.closeWindow()
+        dba_main_window.showWindow()
+
 #################################################################
 
 
@@ -5325,6 +5425,7 @@ dba_user_window = DBA_UserList()
 dba_privileges_window = DBA_privilegesView()
 dba_table_window = DBA_TableView()
 dba_pri_window = DBA_PriView()
+dba_audit_window = DBA_auditView()
 
 #################################################################
 
