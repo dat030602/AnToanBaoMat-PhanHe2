@@ -302,7 +302,9 @@ as
     select manv, tennv, phai, ngaysinh, diachi, sodt, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
     from nvquantri.nhanvien;
 
-grant select, update, insert on nvquantri.UV_NHANVIEN_NHANSU to NHANSU;
+grant select on nvquantri.UV_NHANVIEN_NHANSU to NHANSU;
+grant update(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on nvquantri.UV_NHANVIEN_NHANSU TO NHANSU;
+grant insert(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on nvquantri.UV_NHANVIEN_NHANSU TO NHANSU;
 ------------------------------------------------------------------------------
 
 --Role: Truong de an
