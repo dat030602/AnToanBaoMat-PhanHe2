@@ -140,7 +140,6 @@ BEGIN
     return UTL_I18N.RAW_TO_CHAR(decrypted_raw, 'AL32UTF8');
 END;
 /
-
 INSERT INTO PHONGBAN VALUES('PB001', 'Phong Nhan Su', null);
 INSERT INTO PHONGBAN VALUES('PB002', 'Phong Tai Chinh', null);
 
@@ -192,6 +191,7 @@ INSERT INTO PHANCONG VALUES('NV005', 'DA004', 62);
 COMMIT WORK;
 ------------------------------------------------------------------------------
 ------ Xoa User
+--DROP PROCEDURE USP_DROP_USER
 CREATE OR REPLACE PROCEDURE USP_DROP_USER
 AS
     CURSOR CUR IS (SELECT USERNAME
@@ -242,7 +242,6 @@ EXEC USP_CREATE_USER;
 ------------------------------------------------------------------------------
 --Role: Truong phong
 
-
 --drop USER NVTruongPhong;
 --drop ROLE TRUONGPHONG;
 --CREATE USER NVTruongPhong IDENTIFIED BY a;
@@ -283,37 +282,38 @@ GRANT TRUONGPHONG TO NVTruongPhong;
 
 ------------------------------------------------------------------------------
 --Role: Nhan Su
-
 drop role NHANSU;
 create role NHANSU;
+grant NHANSU to MICHAELSHARP;
 
-grant select, insert, update on nvquantri.PHONGBAN to NHANSU;
-create or replace view nhanvien_ns
+grant select, insert, update on PHONGBAN to NHANSU;
+grant select on DEAN to NHANSU;
+
+create or replace view UV_PHANCONG_NHANSU
 as
-    select manv, tennv, phai, ngaysinh, diachi, sodt,
-        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong,
-        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
+    SELECT pc.MANV, pc.MADA, pc.THOIGIAN
+    FROM PHANCONG pc JOIN NHANVIEN nv ON pc.MANV = nv.MANV
+    WHERE nv.USERNAME = SYS_CONTEXT('USERENV','SESSION_USER');
+
+grant select on UV_PHANCONG_NHANSU to NHANSU;
+
+create or replace view UV_NHANVIEN_NHANSU
+as
+    select manv, tennv, phai, ngaysinh, diachi, sodt, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
     from nvquantri.nhanvien;
 
-grant select on nvquantri.nhanvien_ns to NHANSU;
-grant update(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANTRI.NHANVIEN TO NHANSU;
-grant insert(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANTRI.NHANVIEN TO NHANSU;
-
+grant select on nvquantri.UV_NHANVIEN_NHANSU to NHANSU;
+grant update(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on nvquantri.UV_NHANVIEN_NHANSU TO NHANSU;
+grant insert(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on nvquantri.UV_NHANVIEN_NHANSU TO NHANSU;
 ------------------------------------------------------------------------------
+
 --Role: Truong de an
 drop role TRUONGDEAN;
 create role TRUONGDEAN;
 
---Cac quyen cua nhanvien
-grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.NHANVIEN to TRUONGDEAN;
-GRANT SELECT ON nvquantri.PHANCONG TO TRUONGDEAN;
-GRANT SELECT ON nvquantri.PHONGBAN TO TRUONGDEAN;
-GRANT SELECT ON nvquantri.DEAN TO TRUONGDEAN;
-
 --Cac quyen cua TRUONGDEAN
 grant UPDATE,INSERT,SELECT,DELETE on nvquantri.DEAN to TRUONGDEAN;
 
-GRANT CREATE VIEW TO nvquantri;
 -- connect nvquantri/a;
 
 --DROP VIEW CS_TRUONGDEAN;
@@ -334,56 +334,70 @@ grant select on nvquantri.CS_TRUONGDEAN to TRUONGDEAN;
 drop role NHANVIEN;
 create role NHANVIEN;
 
---Cac quyen cua nhanvien
-grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.NHANVIEN to NHANVIEN;
-GRANT SELECT ON nvquantri.PHANCONG TO NHANVIEN;
-GRANT SELECT ON nvquantri.PHONGBAN TO NHANVIEN;
-GRANT SELECT ON nvquantri.DEAN TO NHANVIEN;
-GRANT CREATE VIEW TO nvquantri;
+-- tao view nhan vien xem thong tin ca nhan
+--DROP VIEW CS_NHANVIEN
+CREATE VIEW CS_NHANVIEN AS
+SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN, NV.USERNAME
+FROM nvquantri.NHANVIEN NV 
+INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV;
 
---connect nvquantri/a
---DROP VIEW CS_NHANVIEN;
---bang nhanvien
-CREATE OR REPLACE VIEW CS_NHANVIEN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
-        FROM nvquantri.NHANVIEN NV 
-        INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
-        WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))   
-        WITH CHECK OPTION;
 
-grant select on nvquantri.CS_NHANVIEN to NHANVIEN;
+--DROP DBMS_RLS
+/
+BEGIN
+ DBMS_RLS.DROP_POLICY(
+ OBJECT_SCHEMA => 'NVQuanTri',
+ OBJECT_NAME =>'CS_NHANVIEN',
+ POLICY_NAME => 'NhanVien_Policy');
+END;
+
+-- Dinh nghia ham policy
+-- Add policy function to database
+CREATE OR REPLACE FUNCTION NVQuanTri.NhanVien_Condition(
+    P_SCHEMA VARCHAR2,
+    P_OBJ VARCHAR2)
+RETURN VARCHAR2
+AS
+    USR VARCHAR2(2000);
+BEGIN
+  USR := SYS_CONTEXT('USERENV','SESSION_USER');
+  RETURN 'USERNAME = ''' ||USR||'''';
+END;
+/
+
+--CREATE DBMS_RLS
+BEGIN
+  DBMS_RLS.ADD_POLICY(
+    object_schema   => 'NVQuanTri',
+    object_name     => 'CS_NHANVIEN',
+    policy_name     => 'NhanVien_Policy',
+    policy_function => 'NhanVien_Condition',
+    statement_types => 'SELECT, UPDATE',
+    update_check    => TRUE
+    );
+END;
+/
+
+
+--cap quyen nhan vien cho role khac
+grant SELECT on CS_NHANVIEN to TAICHINH;
+grant SELECT on CS_NHANVIEN to NHANSU;
+grant SELECT on CS_NHANVIEN to NHANVIEN;
+grant SELECT on CS_NHANVIEN to TRUONGDEAN;
+grant SELECT on CS_NHANVIEN to TRUONGPHONG;
+
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to NHANSU;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TAICHINH;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to NHANVIEN;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TRUONGDEAN;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TRUONGPHONG;
+
 ------------------------------------------------------------------------------
 drop role TAICHINH;
 create role TAICHINH;
+
 --Cs#4: Taichinh
---Cac quyen cua nhanvien
-grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.NHANVIEN to TAICHINH;
-GRANT SELECT ON nvquantri.PHONGBAN TO TAICHINH;
-GRANT SELECT ON nvquantri.DEAN TO TAICHINH;
-
---xem/them/cap nhat NHANVIEN va PHONGBAN
-grant select on nvquantri.NHANVIEN to TAICHINH;
-grant UPDATE(LUONG, PHUCAP) on nvquantri.NHANVIEN to TAICHINH;
-
-grant select on nvquantri.PHANCONG to TAICHINH;
-
-
---connect nvquantri/1234;
---DROP VIEW CS_NHANVIEN;
---bang nhanvien
-CREATE OR REPLACE VIEW CS_NHANVIEN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT,
-            F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP,
-            NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
-        FROM nvquantri.NHANVIEN NV 
-        INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
-        WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))
-        WITH CHECK OPTION;
-
-SELECT * FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG;
-
-
-grant select on nvquantri.CS_NHANVIEN to TAICHINH;
+grant UPDATE(LUONG, PHUCAP) on nvquantri.CS_NHANVIEN to TAICHINH;
 
 ------------------------------------------------------------------------------
 drop role QLTRUCTIEP;
