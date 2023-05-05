@@ -6973,7 +6973,7 @@ def main():
     #     except Exception as err:
     #         print("Error initializing Oracle Client:", err)
     #         sys.exit(1)
-    app = QtWidgets.QApplication(sys.argv)
+    # app = QtWidgets.QApplication(sys.argv)
     global login_window
     login_window.Load_Data()
     login_window.showWindow()
