@@ -2,8 +2,8 @@ import sys
 import cx_Oracle
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
-from PySide2 import QtGui, QtCore, QtWidgets
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton
 # import messagebox
 from PyQt5.QtCore import Qt
 from tkinter import messagebox
@@ -195,8 +195,8 @@ class LoginController:
         self.username_text = username_text
         self.password_text = password_text
 
-        result = execute_query(username_text, password_text,
-                               "select GRANTED_ROLE from USER_ROLE_PRIVS WHERE GRANTED_ROLE NOT IN(select GRANTED_ROLE from ROLE_ROLE_PRIVS)")
+        sql = "select GRANTED_ROLE from USER_ROLE_PRIVS WHERE GRANTED_ROLE NOT IN(select GRANTED_ROLE from ROLE_ROLE_PRIVS)"
+        result = execute_query(self.username_text, self.password_text, sql)
 
         if result:
             global login_info
@@ -466,7 +466,7 @@ def MessageBoxWarn(title, message):
 
 def execute_query(username, password, queryString):
     try:
-        con = cx_Oracle.connect(username, password, 'localhost:1521/ORCLPDB')
+        con = cx_Oracle.connect(username, password, 'localhost:1521/XEPDB1')
 
     except cx_Oracle.DatabaseError as er:
         print('There is an error in the Oracle database:', er)
@@ -5431,17 +5431,17 @@ dba_audit_window = DBA_auditView()
 
 
 def main():
-    # lib_dir = r"C:\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
+    lib_dir = r"C:\thong\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
     # lib_dir = "C:\oclient\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
-    # global oracle_client_initialized
-    # oracle_client_initialized = False
-    # if not oracle_client_initialized:
-    #     try:
-    #         cx_Oracle.init_oracle_client(lib_dir=lib_dir)
-    #         oracle_client_initialized = True
-    #     except Exception as err:
-    #         print("Error initializing Oracle Client:", err)
-    #         sys.exit(1)
+    global oracle_client_initialized
+    oracle_client_initialized = False
+    if not oracle_client_initialized:
+        try:
+            cx_Oracle.init_oracle_client(lib_dir=lib_dir)
+            oracle_client_initialized = True
+        except Exception as err:
+            print("Error initializing Oracle Client:", err)
+            sys.exit(1)
     app = QtWidgets.QApplication(sys.argv)
     global login_window
     login_window.Load_Data()
