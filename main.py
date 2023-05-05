@@ -296,7 +296,7 @@ class NhanSu_controller:
 
     def nv_list(self):
         result = execute_query(
-            login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.NHANVIEN_NS')
+            login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.UV_NHANVIEN_NHANSU')
         return result
 
     def add_pb(self, id, name, trphg):
@@ -306,7 +306,7 @@ class NhanSu_controller:
 
     def add_nv(self, id, name, gt, ngsinh, dc, sdt, vaitro, ql, phg):
         result = execute_query(
-            login_info[0], login_info[1], 'INSERT INTO NVQUANTRI.NHANVIEN(MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) VALUES(' + "'{0}', '{1}', '{2}', TO_DATE('{3}','DD/MM/YYYY'), '{4}', '{5}', '{6}', '{7}', '{8}')".format(id, name, gt, ngsinh, dc, sdt, vaitro, ql, phg))
+            login_info[0], login_info[1], 'INSERT INTO NVQUANTRI.UV_NHANVIEN_NHANSU(MANV, TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) VALUES(' + "'{0}', '{1}', '{2}', TO_DATE('{3}','DD/MM/YYYY'), '{4}', '{5}', '{6}', '{7}', '{8}')".format(id, name, gt, ngsinh, dc, sdt, vaitro, ql, phg))
         return result
 
     def update_pb(self, clause, res, condition):
@@ -348,7 +348,7 @@ class NhanSu_controller:
             condition = 'PHG'
 
         result = execute_query(
-            login_info[0], login_info[1], 'UPDATE NVQUANTRI.NHANVIEN SET ' + "{0} = '{1}' WHERE {2} = '{3}'".format(clause, res, condition, condition_res))
+            login_info[0], login_info[1], 'UPDATE NVQUANTRI.UV_NHANVIEN_NHANSU SET ' + "{0} = '{1}' WHERE {2} = '{3}'".format(clause, res, condition, condition_res))
         return result
     
     def get_thongtin_list(self):
@@ -365,6 +365,11 @@ class NhanSu_controller:
     def get_phongbandean_list(self):
         sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
         result = execute_query(login_info[0], login_info[1], sql)
+        return result
+    
+    def phancong_list(self):
+        result = execute_query(
+            login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.UV_PHANCONG_NHANSU')
         return result
 
 
@@ -1891,41 +1896,50 @@ class Role_Nhan_su:
         # Thiết lập kích thước cho widget
         self.main_window.resize(700, 520)
 
-        # Hiện thị danh sách user
-        self.button_user = QtWidgets.QPushButton(
-            'PHONGBAN', self.main_window)
-        self.button_user.move(120, 120)
-        self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # Hiện thị danh sách phòng ban
+        self.button_pb = QtWidgets.QPushButton(
+            'Điều chỉnh phòng ban', self.main_window)
+        self.button_pb.move(120, 120)
+        self.button_pb.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
-        self.button_user.clicked.connect(self.on_click_pb)
+        self.button_pb.clicked.connect(self.on_click_pb)
 
-        # Hiện thị danh sách role
-        self.button_role = QtWidgets.QPushButton(
-            'NHANVIEN', self.main_window)
-        self.button_role.move(380, 120)
-        self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # Hiện thị danh sách nhân viên
+        self.button_nv = QtWidgets.QPushButton(
+            'Danh sách nhân viên', self.main_window)
+        self.button_nv.move(380, 120)
+        self.button_nv.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
-        self.button_role.clicked.connect(self.on_click_nv)
-
-        # Hiện thị danh sách thông tin phân công
-        self.button_assign = QtWidgets.QPushButton(
-            'Thông tin cá nhân', self.main_window)
-        self.button_assign.move(120, 240)
-        # Thiết lập kích thước cố định
-        self.button_assign.setFixedSize(180, 60)
-        # thiết lập hover cursor
-        self.button_assign.clicked.connect(self.clicked_infomation)
+        self.button_nv.clicked.connect(self.on_click_nv)
 
         # Hiện thị danh sách thông tin cá nhân
-        self.button_assign = QtWidgets.QPushButton(
+        self.button_info = QtWidgets.QPushButton(
+            'Thông tin cá nhân', self.main_window)
+        self.button_info.move(120, 240)
+        # Thiết lập kích thước cố định
+        self.button_info.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_info.clicked.connect(self.clicked_infomation)
+
+        # Hiện thị danh sách thông tin phòng ban & đề án
+        self.button_pbda = QtWidgets.QPushButton(
             'Xem phòng ban và đề án', self.main_window)
-        self.button_assign.move(380, 240)
+        self.button_pbda.move(380, 240)
+        # Thiết lập kích thước cố định
+        self.button_pbda.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_pbda.clicked.connect(self.clicked_Department)
+
+        # Hiện thị danh sách phân công
+        self.button_assign = QtWidgets.QPushButton(
+            'Danh sách phân công', self.main_window)
+        self.button_assign.move(120, 360)
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
-        self.button_assign.clicked.connect(self.clicked_Department)
+        self.button_assign.clicked.connect(self.clicked_Assign)
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -1959,6 +1973,12 @@ class Role_Nhan_su:
         global window_nhansu_PhongBanDeAn
         window_nhansu_PhongBanDeAn.Load_Data()
         window_nhansu_PhongBanDeAn.showWindow()   
+
+    def clicked_Assign(self):
+        nhansu.closeWindow()
+        global window_nhansu_phancong
+        window_nhansu_phancong.Load_data()
+        window_nhansu_phancong.showWindow()
 
     def showWindow(self):
         self.main_window.show()
@@ -2693,6 +2713,59 @@ class Nhanvienview:
 
     def Backmenu(self):
         pb_window2.closeWindow()
+        global nhansu
+        nhansu.Load_Data()
+        nhansu.showWindow()
+
+class NhanSu_Phancongview:
+    def Load_data(self):
+        self.ns_controller = NhanSu_controller()
+        self.pc_list = self.ns_controller.phancong_list()
+        self.main_window = QtWidgets.QMainWindow()
+        self.main_window.setWindowTitle('Danh sách phân công')
+
+        self.table_widget = QtWidgets.QTableWidget()
+        self.table_widget.setColumnCount(3)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['Mã nhân viên', 'Mã đề án', 'Thời gian'])
+
+        # self.table_widget.selectionModel().selectionChanged.connect(self.on_sel)
+        for pc in self.pc_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(pc[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(pc[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(pc[2])))
+
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFixedWidth(420)
+        self.scroll_area.setFixedHeight(250)
+        self.scroll_area.setWidget(self.table_widget)
+        self.main_window.setCentralWidget(self.scroll_area)
+
+        self.main_window.resize(700, 520)
+
+         # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def Backmenu(self):
+        window_nhansu_phancong.closeWindow()
         global nhansu
         nhansu.Load_Data()
         nhansu.showWindow()
@@ -6845,6 +6918,7 @@ pb_window2 = Nhanvienview()
 window_nhansu_ThongTincanhan = Nhansu_thongtincanhan()
 window_nhansu_PhongBanDeAn = NhanSu_PhongBanDeAn()
 window_nhansu_update = update_NhanSu_canhan()
+window_nhansu_phancong = NhanSu_Phancongview()
 
 # Nhân viên
 Nhanvien_window = NhanVien_view()

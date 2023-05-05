@@ -283,22 +283,27 @@ GRANT TRUONGPHONG TO NVTruongPhong;
 
 ------------------------------------------------------------------------------
 --Role: Nhan Su
-
 drop role NHANSU;
 create role NHANSU;
+grant NHANSU to MICHAELSHARP;
 
-grant select, insert, update on nvquantri.PHONGBAN to NHANSU;
-create or replace view nhanvien_ns
+grant select, insert, update on PHONGBAN to NHANSU;
+grant select on DEAN to NHANSU;
+
+create or replace view UV_PHANCONG_NHANSU
 as
-    select manv, tennv, phai, ngaysinh, diachi, sodt,
-        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong,
-        DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
+    SELECT pc.MANV, pc.MADA, pc.THOIGIAN
+    FROM PHANCONG pc JOIN NHANVIEN nv ON pc.MANV = nv.MANV
+    WHERE nv.USERNAME = SYS_CONTEXT('USERENV','SESSION_USER');
+
+grant select on UV_PHANCONG_NHANSU to NHANSU;
+
+create or replace view UV_NHANVIEN_NHANSU
+as
+    select manv, tennv, phai, ngaysinh, diachi, sodt, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(luong), NULL) luong, DECODE (username, SYS_CONTEXT('USERENV','SESSION_USER'), F_DECRYPT_NHANVIEN(phucap), NULL) phucap, vaitro, manql, phg 
     from nvquantri.nhanvien;
 
-grant select on nvquantri.nhanvien_ns to NHANSU;
-grant update(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANTRI.NHANVIEN TO NHANSU;
-grant insert(TENNV, PHAI, NGAYSINH, DIACHI, SODT, VAITRO, MANQL, PHG) on NVQUANTRI.NHANVIEN TO NHANSU;
-
+grant select, update, insert on nvquantri.UV_NHANVIEN_NHANSU to NHANSU;
 ------------------------------------------------------------------------------
 --Role: Truong de an
 drop role TRUONGDEAN;
