@@ -339,19 +339,66 @@ grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.NHANVIEN to NHANVIEN;
 GRANT SELECT ON nvquantri.PHANCONG TO NHANVIEN;
 GRANT SELECT ON nvquantri.PHONGBAN TO NHANVIEN;
 GRANT SELECT ON nvquantri.DEAN TO NHANVIEN;
-GRANT CREATE VIEW TO nvquantri;
 
 --connect nvquantri/a
---DROP VIEW CS_NHANVIEN;
---bang nhanvien
-CREATE OR REPLACE VIEW CS_NHANVIEN AS
-        SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, F_DECRYPT_NHANVIEN(NV.LUONG) LUONG, F_DECRYPT_NHANVIEN(NV.PHUCAP) PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN 
-        FROM nvquantri.NHANVIEN NV 
-        INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV
-        WHERE NV.USERNAME = (SYS_CONTEXT('USERENV', 'SESSION_USER'))   
-        WITH CHECK OPTION;
+-- tao view nhan vien xem thong tin ca nhan
+--DROP VIEW CS_NHANVIEN
+CREATE VIEW CS_NHANVIEN AS
+SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN, NV.USERNAME
+FROM nvquantri.NHANVIEN NV 
+INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV;
 
-grant select on nvquantri.CS_NHANVIEN to NHANVIEN;
+
+--DROP DBMS_RLS
+/
+BEGIN
+ DBMS_RLS.DROP_POLICY(
+ OBJECT_SCHEMA => 'NVQuanTri',
+ OBJECT_NAME =>'CS_NHANVIEN',
+ POLICY_NAME => 'NhanVien_Policy');
+END;
+
+-- Dinh nghia ham policy
+-- Add policy function to database
+CREATE OR REPLACE FUNCTION NVQuanTri.NhanVien_Condition(
+    P_SCHEMA VARCHAR2,
+    P_OBJ VARCHAR2)
+RETURN VARCHAR2
+AS
+    USR VARCHAR2(2000);
+BEGIN
+  USR := SYS_CONTEXT('USERENV','SESSION_USER');
+  RETURN 'USERNAME = ''' ||USR||'''';
+END;
+/
+
+--CREATE DBMS_RLS
+BEGIN
+  DBMS_RLS.ADD_POLICY(
+    object_schema   => 'NVQuanTri',
+    object_name     => 'CS_NHANVIEN',
+    policy_name     => 'NhanVien_Policy',
+    policy_function => 'NhanVien_Condition',
+    statement_types => 'SELECT, UPDATE',
+    update_check    => TRUE
+    );
+END;
+/
+
+
+--cap quyen cho nhan vien 
+grant SELECT on CS_NHANVIEN to TAICHINH
+grant SELECT on CS_NHANVIEN to NHANSU
+grant SELECT on CS_NHANVIEN to NHANVIEN
+grant SELECT on CS_NHANVIEN to TRUONGDEAN
+grant SELECT on CS_NHANVIEN to TRUONGPHONG
+
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to NHANSU;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TAICHINH;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to NHANVIEN;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TRUONGDEAN;
+grant UPDATE(NGAYSINH, DIACHI, SODT) on nvquantri.CS_NHANVIEN to TRUONGPHONG;
+
 ------------------------------------------------------------------------------
 drop role TAICHINH;
 create role TAICHINH;
@@ -366,6 +413,7 @@ grant select on nvquantri.NHANVIEN to TAICHINH;
 grant UPDATE(LUONG, PHUCAP) on nvquantri.NHANVIEN to TAICHINH;
 
 grant select on nvquantri.PHANCONG to TAICHINH;
+
 
 
 --connect nvquantri/1234;

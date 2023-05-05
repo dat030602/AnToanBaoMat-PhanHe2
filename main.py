@@ -10,7 +10,6 @@ from tkinter import messagebox
 from datetime import datetime
 
 
-# Controller : DBA
 
 class pri_Controller:
     def display_table_list(self):
@@ -177,11 +176,6 @@ class User_Controller:
             login_info[0], login_info[1], 'REVOKE {0} FROM {1}'.format(pri_name, user_name))
         return result
 
-class Audit_Controller:
-    def display_user_audit(self, user_name):
-        result = execute_query(
-            login_info[0], login_info[1], 'select action_name, object_name, event_timestamp from unified_audit_trail where dbusername =' + "'{0}' order by event_timestamp desc".format(user_name))
-        return result
 
 # Controller: Login
 
@@ -194,6 +188,7 @@ class LoginController:
     def login_connect(self, username_text, password_text):
         self.username_text = username_text
         self.password_text = password_text
+
 
         sql = "select GRANTED_ROLE from USER_ROLE_PRIVS WHERE GRANTED_ROLE NOT IN(select GRANTED_ROLE from ROLE_ROLE_PRIVS)"
         result = execute_query(self.username_text, self.password_text, sql)
@@ -272,6 +267,24 @@ class TruongPhong_ListStaff_Controller:
         return result
 
 
+class Truongphong_info:
+    def get_thongtin_list(self):
+        sql = "select * from nvquantri.CS_NHANVIEN"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
+    def update_info(self, manv, ngaysinh, diachi, sodt):
+        sql = "UPDATE nvquantri.CS_NHANVIEN SET NgaySinh = '{0}', DiaChi = '{1}', SoDT = '{2}' WHERE MANV = '{3}'".format(
+            ngaysinh, diachi, sodt, manv)
+        result, er = execute_query(login_info[0], login_info[1], sql)
+        return result, er
+    
+    def get_phongbandean_list(self):
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
+
 # Controller: Nhân sự
 
 
@@ -337,6 +350,23 @@ class NhanSu_controller:
         result = execute_query(
             login_info[0], login_info[1], 'UPDATE NVQUANTRI.NHANVIEN SET ' + "{0} = '{1}' WHERE {2} = '{3}'".format(clause, res, condition, condition_res))
         return result
+    
+    def get_thongtin_list(self):
+        sql = "select * from nvquantri.CS_NHANVIEN"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
+    def update_info(self, manv, ngaysinh, diachi, sodt):
+        sql = "UPDATE nvquantri.CS_NHANVIEN SET NgaySinh = '{0}', DiaChi = '{1}', SoDT = '{2}' WHERE MANV = '{3}'".format(
+            ngaysinh, diachi, sodt, manv)
+        result, er = execute_query(login_info[0], login_info[1], sql)
+        return result, er
+    
+    def get_phongbandean_list(self):
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
 
 
 # Controller: Nhân viên
@@ -351,6 +381,11 @@ class NhanVien_controller:
             ngaysinh, diachi, sodt, manv)
         result, er = execute_query(login_info[0], login_info[1], sql)
         return result, er
+    
+    def get_phongbandean_list(self):
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
 
 
 # Controller: Đề án
@@ -367,7 +402,12 @@ class DeAn_controller:
             tenda, ngaybd, phong, mada)
         result, er = execute_query(login_info[0], login_info[1], sql)
         return result, er
-
+    
+    def remove_assignment(self,mada):
+        sql = "DELETE FROM nvquantri.PHANCONG WHERE MADA = '{0}'".format(mada)
+        result, er = execute_query(login_info[0], login_info[1], sql)
+        return result, er
+    
     def delete_info(self, mada):
         sql = "DELETE FROM nvquantri.DEAN WHERE MADA = '{0}'".format(mada)
         result, er = execute_query(login_info[0], login_info[1], sql)
@@ -381,6 +421,22 @@ class DeAn_controller:
 
     def count_existing_mada(self):
         sql = "SELECT COUNT(*) FROM nvquantri.DEAN"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+    
+    def get_thongtin_list(self):
+        sql = "select * from nvquantri.CS_NHANVIEN"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
+    def update_info(self, manv, ngaysinh, diachi, sodt):
+        sql = "UPDATE nvquantri.CS_NHANVIEN SET NgaySinh = '{0}', DiaChi = '{1}', SoDT = '{2}' WHERE MANV = '{3}'".format(
+            ngaysinh, diachi, sodt, manv)
+        result, er = execute_query(login_info[0], login_info[1], sql)
+        return result, er
+    
+    def get_phongbandean_list(self):
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
         result = execute_query(login_info[0], login_info[1], sql)
         return result
 
@@ -405,7 +461,7 @@ class Taichinh_controller:
         return result
 
     def get_phongbandean_list(self):
-        sql = "SELECT * FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
         result = execute_query(login_info[0], login_info[1], sql)
         return result
 
@@ -440,6 +496,22 @@ class QLTructiep_controller:
             login_info[0], login_info[1], 'SELECT * FROM NVQUANTRI.NHANVIEN_QLTRUCTIEP')
         return result
 
+    def get_thongtin_list(self):
+        sql = "select * from nvquantri.CS_NHANVIEN"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
+    def update_info(self, manv, ngaysinh, diachi, sodt):
+        sql = "UPDATE nvquantri.CS_NHANVIEN SET NgaySinh = '{0}', DiaChi = '{1}', SoDT = '{2}' WHERE MANV = '{3}'".format(
+            ngaysinh, diachi, sodt, manv)
+        result, er = execute_query(login_info[0], login_info[1], sql)
+        return result, er
+    
+    def get_phongbandean_list(self):
+        sql = "SELECT MAPB, TENPB, TRPHG, MADA, TENDA, NGAYBD FROM nvquantri.PHONGBAN PB JOIN nvquantri.DEAN DA ON PB.MAPB = DA.PHONG"
+        result = execute_query(login_info[0], login_info[1], sql)
+        return result
+
 #################################################################
 
 
@@ -457,16 +529,12 @@ def MessageBoxErr(title, message):
 def MessageBoxWarn(title, message):
     messagebox.showwarning(title, message)
 
-
 #################################################################
 
-
 # Database connection
-
-
 def execute_query(username, password, queryString):
     try:
-        con = cx_Oracle.connect(username, password, 'localhost:1521/XEPDB1')
+        con = cx_Oracle.connect(username, password, 'localhost:1521/ORCLPDB')   #XEPDB1
 
     except cx_Oracle.DatabaseError as er:
         print('There is an error in the Oracle database:', er)
@@ -495,7 +563,7 @@ def execute_query(username, password, queryString):
             if cur:
                 cur.close()
             return False, error_obj.code
-
+        
 
 def connection2(username, password):
     try:
@@ -511,19 +579,13 @@ def connection2(username, password):
         error_obj, = er.args
         print('Error:'+str(er))
         return False, error_obj.code
-
-
 #################################################################
 
-
 # Views: Main
-
-
 class LoginWindow:
     def Load_Data(self):
         self.login_controllers = LoginController()
         self.login_window = QtWidgets.QMainWindow()
-
         # Thiết lập tiêu đề cho cửa sổ
         self.login_window.setWindowTitle('login')
 
@@ -534,27 +596,27 @@ class LoginWindow:
         user_name = QLabel(self.login_window)
         user_name.setText("Nhập username: ")
         user_name.setStyleSheet("font-size: 14px;")
-        user_name.move(250, 20)
+        user_name.move(240, 80)
 
         # Thiết lập ô nhập input username
         self.username_input = QLineEdit(self.login_window)
         self.username_input.setPlaceholderText("user name")
         self.username_input.setStyleSheet("QLineEdit { padding-left: 20px; }")
         self.username_input.setFixedWidth(160)
-        self.username_input.move(250, 60)
+        self.username_input.move(240, 120)
 
         #   Thiết lập ô hiện thị nhập password
         password = QLabel(self.login_window)
         password.setText("Nhập password: ")
         password.setStyleSheet("font-size: 14px;")
-        password.move(250, 110)
+        password.move(240, 170)
 
         # Thiết lập ô nhập input password
         self.password_input = QLineEdit(self.login_window)
         self.password_input.setPlaceholderText("password")
         self.password_input.setStyleSheet("QLineEdit { padding-left: 20px; }")
         self.password_input.setFixedWidth(160)
-        self.password_input.move(250, 150)
+        self.password_input.move(240, 210)
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.returnPressed.connect(self.enter_login)
 
@@ -564,17 +626,82 @@ class LoginWindow:
         self.btn_login.setStyleSheet('background-color: #3450D9; color: #fff')
         self.btn_login.setText("Login")
         self.btn_login.clicked.connect(self.clicked_login)
-        self.btn_login.move(300, 190)
-        # thiết lập hover cursor
+        self.btn_login.move(290, 280)
+    
+
+        self.username_input.returnPressed.connect(self.enter_login)  # Kích hoạt sự kiện khi người dùng nhấn Enter trên ô nhập tên đăng nhập
+        self.password_input.returnPressed.connect(self.enter_login)  # Kích hoạt sự kiện khi người dùng nhấn Enter trên ô nhập mật khẩu
         
 
     def clicked_login(self):
+      
+        self.user_name_text = self.username_input.text()
+        self.password_text = self.password_input.text()
+        
+        if self.user_name_text == '':
+            MessageBoxErr("Thông báo","Vui Lòng nhập username")
+            return
+        
+        if self.password_text == '':
+            MessageBoxErr("Thông báo","Vui Lòng nhập password")
+            return
+        
+        special_chars = ['\'', '\"', '\\', '%', '_', '&', '*', '#', '~', '^', '/', '"', "'"]
+
+        if any(char in self.user_name_text or char in self.password_text for char in special_chars):
+            MessageBoxErr("Thông báo", "Vui lòng không nhập ký tự đặc biệt")
+            return
+        
+        else:
+            result = self.login_controllers.login_connect(
+                self.user_name_text, self.password_text)
+            
+            if result:
+                # MessageBoxInfo("Dang nhap", "Thanh cong")
+                login_window.closeWindow()
+                # Đăng nhập thành công, chuyển qua trang menu
+
+                if login_info[2] == 'DBA':
+                    global dba_main_window
+                    dba_main_window.Load_Data()
+                    dba_main_window.showWindow()
+                elif login_info[2] == 'TRUONGPHONG':
+                    global truongphong
+                    truongphong.Load_Data()
+                    truongphong.showWindow()
+                elif login_info[2] == 'QLTRUCTIEP':
+                    global qltructiep
+                    qltructiep.Load_Data()
+                    qltructiep.showWindow()
+                    print("Comming soon")
+                elif login_info[2] == 'TAICHINH':
+                    global taichinh_window
+                    taichinh_window.Load_Data()
+                    taichinh_window.showWindow()
+                elif login_info[2] == 'NHANSU':
+                    global nhansu
+                    nhansu.Load_Data()
+                    nhansu.showWindow()
+                elif login_info[2] == 'TRUONGDEAN':
+                    global dean_window
+                    dean_window.Load_Data()
+                    dean_window.showWindow()
+                elif login_info[2] == 'NHANVIEN':
+                    global Nhanvien_window
+                    Nhanvien_window.Load_Data()
+                    Nhanvien_window.showWindow()
+                self.username_input.setText('')
+                self.password_input.setText('')
+            else:
+                MessageBoxErr("Dang nhap", "That Bai")
+
+    def enter_login(self):
         self.user_name_text = self.username_input.text()
         self.password_text = self.password_input.text()
         result = self.login_controllers.login_connect(
             self.user_name_text, self.password_text)
+       
         if result:
-            # MessageBoxInfo("Dang nhap", "Thanh cong")
             login_window.closeWindow()
             # Đăng nhập thành công, chuyển qua trang menu
 
@@ -604,131 +731,17 @@ class LoginWindow:
                 dean_window.Load_Data()
                 dean_window.showWindow()
             elif login_info[2] == 'NHANVIEN':
-                global Nhanvien_windown
-                Nhanvien_windown.Load_Data()
-                Nhanvien_windown.showWindow()
-            self.username_input.setText('')
-            self.password_input.setText('')
+                global Nhanvien_window
+                Nhanvien_window.Load_Data()
+                Nhanvien_window.showWindow()
         else:
             MessageBoxErr("Dang nhap", "That Bai")
-
-    def enter_login(self, e):
-        if e.key() == "16777220":
-
-            self.user_name_text = self.username_input.text()
-            self.password_text = self.password_input.text()
-            result = self.login_controllers.login_connect(
-                self.user_name_text, self.password_text)
-            if result:
-                # MessageBoxInfo("Dang nhap", "Thanh cong")
-                login_window.closeWindow()
-                # Đăng nhập thành công, chuyển qua trang menu
-
-                if login_info[2] == 'TRUONGPHONG':
-                    global truongphong
-                    truongphong.Load_Data()
-                    truongphong.showWindow()
-                elif login_info[2] == 'QLTRUCTIEP':
-                    global qltructiep
-                    qltructiep.Load_Data()
-                    qltructiep.showWindow()
-                    print("Comming soon")
-                elif login_info[2] == 'TAICHINH':
-                    global taichinh_window
-                    taichinh_window.Load_Data()
-                    taichinh_window.showWindow()
-                elif login_info[2] == 'NHANSU':
-                    global nhansu
-                    nhansu.Load_Data()
-                    nhansu.showWindow()
-                elif login_info[2] == 'TRUONGDEAN':
-                    global dean_window
-                    dean_window.Load_Data()
-                    dean_window.showWindow()
-            else:
-                MessageBoxErr("Dang nhap", "That Bai")
 
     def closeWindow(self):
         self.login_window.hide()
 
     def showWindow(self):
         self.login_window.show()
-
-
-class ThongTinCaNhan:
-    def Load_Data(self):
-        # Khởi tạo đối tượng QMainWindow
-        self.main_window = QtWidgets.QMainWindow()
-
-        # Thiết lập tiêu đề cho cửa sổ
-        self.main_window.setWindowTitle('Thông tin cá nhân')
-        # Thiết lập kích thước cho widget
-        self.main_window.resize(700, 520)
-
-        # Khởi tạo table widget để hiển thị danh sách người dùng
-        self.table_widget = QtWidgets.QTableWidget()
-        # Đặt số lượng cột cho table widget
-        self.table_widget.setColumnCount(13)
-        self.table_widget.setHorizontalHeaderLabels(
-            ['MANV', 'TENNV', 'PHAI', 'NGAYSINH', 'DIACHI', 'SODT', 'SODT', 'PHUCAP', 'VAITRO', 'MANQL', 'PHG', 'MADA', 'THOIGIAN'])
-
-        # Tạo khung cuộn
-        scroll_area = QtWidgets.QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setFixedWidth(390)
-        scroll_area.setFixedHeight(400)
-
-        # Đặt bảng trong khung cuộn
-        scroll_area.setWidget(self.table_widget)
-        # # Thêm tab_widget vào QMainWindow
-        self.main_window.setCentralWidget(scroll_area)
-
-        # Thiết lập button thêm đề án
-        self.btn_back = QtWidgets.QPushButton(self.main_window)
-        self.btn_back.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
-        self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
-        self.btn_back.setText("THÊM")
-        self.btn_back.move(480, 100)
-        # self.btn_back.clicked.connect(self.Backmenu)
-
-        # Thiết lập button xóa đề án
-        self.btn_back = QtWidgets.QPushButton(self.main_window)
-        self.btn_back.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
-        self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
-        self.btn_back.setText("XÓA")
-        self.btn_back.move(480, 160)
-        # self.btn_back.clicked.connect(self.Backmenu)
-
-        # Thiết lập button sửa đề án
-        self.btn_back = QtWidgets.QPushButton(self.main_window)
-        self.btn_back.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
-        self.btn_back.setStyleSheet('background-color: #999999; color: #fff')
-        self.btn_back.setText("CHỈNH SỬA")
-        self.btn_back.move(480, 220)
-        # self.btn_back.clicked.connect(self.Backmenu)
-
-        # Thiết lập button back
-        self.btn_back = QtWidgets.QPushButton(self.main_window)
-        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
-        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
-        self.btn_back.setText("BACK")
-        self.btn_back.move(610, 470)
-        self.btn_back.clicked.connect(self.Backmenu)
-
-    def closeWindow(self):
-        self.main_window.hide()
-
-    def showWindow(self):
-        self.main_window.show()
-
-    def Backmenu(self):
-
-        window_tab1.closeWindow()
-        global Nhanvien_windown
-
-        Nhanvien_windown.Load_Data()
-        Nhanvien_windown.showWindow()
-
 
 # View: Trưởng phòng
 
@@ -742,32 +755,40 @@ class Role_TruongPhong:
         # Thiết lập kích thước cho widget
         self.main_window.resize(700, 520)
 
-        # Hiện thị Thông tin cá nhân
-        self.button_info = QtWidgets.QPushButton(
-            'Thông tin cá nhân', self.main_window)
-        self.button_info.move(120, 120)
-        self.button_info.setFixedSize(180, 60)  # Thiết lập kích thước cố định
-        # thiết lập hover cursor
-        
-        self.button_info.clicked.connect(self.on_click_ThongTinCaNhan)
-
-        # Hiện thị Danh sách các phân công
-        self.button_role = QtWidgets.QPushButton(
-            'Danh sách các phân công ', self.main_window)
-        self.button_role.move(340, 120)
-        self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
-        # thiết lập hover cursor
-        
-        self.button_role.clicked.connect(self.on_click_assignment_list)
-
         # Hiện thị Danh sách nhân viên của phòng
         self.button_user = QtWidgets.QPushButton(
-            'Danh sách nhân viên của phòng', self.main_window)
-        self.button_user.move(120, 220)
+            'Danh sách nhân viên phòng', self.main_window)
+        self.button_user.move(120, 120)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
         self.button_user.clicked.connect(self.on_click_TruongPhong_ListStaff)
+
+        # Hiện thị Danh sách các phân công
+        self.button_role = QtWidgets.QPushButton(
+            'Danh sách các phân công ', self.main_window)
+        self.button_role.move(380, 120)
+        self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        self.button_role.clicked.connect(self.on_click_assignment_list)
+
+         # Hiện thị danh sách thông tin phân công
+        self.button_assign = QtWidgets.QPushButton(
+            'Thông tin cá nhân', self.main_window)
+        self.button_assign.move(120, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_infomation)
+
+        # Hiện thị danh sách thông tin cá nhân
+        self.button_assign = QtWidgets.QPushButton(
+            'Xem phòng ban và đề án', self.main_window)
+        self.button_assign.move(380, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_Department)
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -790,11 +811,17 @@ class Role_TruongPhong:
         assignment_list.Load_Data()
         assignment_list.showWindow()
 
-    def on_click_ThongTinCaNhan(self):
+    def clicked_infomation(self):
         truongphong.closeWindow()
-        global window_nhanvien_ThongTinCaNhan
-        window_nhanvien_ThongTinCaNhan.Load_Data()
-        window_nhanvien_ThongTinCaNhan.showWindow()
+        global window_truongphong_ThongTincanhan
+        window_truongphong_ThongTincanhan.Load_Data()
+        window_truongphong_ThongTincanhan.showWindow()
+
+    def clicked_Department(self):
+        truongphong.closeWindow()
+        global window_truongphong_PhongBanDeAn
+        window_truongphong_PhongBanDeAn.Load_Data()
+        window_truongphong_PhongBanDeAn.showWindow()   
 
     def closeWindow(self):
         self.main_window.hide()
@@ -812,6 +839,8 @@ class Role_TruongPhong:
 
         global login_window
         login_window.showWindow()
+
+        print("Logout")
 
 
 class AssignmentList_View:
@@ -1532,6 +1561,324 @@ class TruongPhong_ListStaff_View:
             self.txt_Manager.setText(self.data_Roles["MANQL"])
 
 
+class TruongPhong_thongtincanhan:
+    def Load_Data(self):
+        self.user_list = []
+        self.datalist = Truongphong_info()
+
+        self.manv = ''
+        self.ngaysinh = ''
+        self.diachi = ''
+        self.sodt = ''
+
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Thông tin cá nhân')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.user_list = self.datalist.get_thongtin_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(13)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MANV', 'TENNV', 'PHAI', 'NGAYSINH', 'DIACHI', 'SODT', 'LUONG', 'PHUCAP', 'VAITRO', 'MANQL', 'PHG', 'MADA', 'THOIGIAN'])
+        for item in self.user_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+            self.table_widget.setItem(
+                row_position, 6, QtWidgets.QTableWidgetItem(str(item[6])))
+            self.table_widget.setItem(
+                row_position, 7, QtWidgets.QTableWidgetItem(str(item[7])))
+            self.table_widget.setItem(
+                row_position, 8, QtWidgets.QTableWidgetItem(str(item[8])))
+            self.table_widget.setItem(
+                row_position, 9, QtWidgets.QTableWidgetItem(str(item[9])))
+            self.table_widget.setItem(
+                row_position, 10, QtWidgets.QTableWidgetItem(str(item[10])))
+            self.table_widget.setItem(
+                row_position, 11, QtWidgets.QTableWidgetItem(str(item[11])))
+            self.table_widget.setItem(
+                row_position, 12, QtWidgets.QTableWidgetItem(str(item[12])))
+        self.update_textbox_info()
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(700)
+        scroll_area.setFixedHeight(130)
+
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button sửa đề án
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
+        self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 280)
+        self.btn_update.clicked.connect(self.click_update)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def click_update(self):
+        global window_truongphong_update
+        window_truongphong_update.Load_Data(
+            self.manv, self.ngaysinh, self.diachi, self.sodt)
+        window_truongphong_update.showWindow()
+
+    def update_info(self):
+        self.user_list = self.datalist.get_thongtin_list()
+        if self.table_widget is not None:
+            self.table_widget.clearContents()
+            self.table_widget.setRowCount(0)
+            self.table_widget.setRowCount(len(self.user_list))
+            for row, user in enumerate(self.user_list):
+                self.table_widget.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(str(user[0])))
+                self.table_widget.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(str(user[1])))
+                self.table_widget.setItem(
+                    row, 2, QtWidgets.QTableWidgetItem(str(user[2])))
+                self.table_widget.setItem(
+                    row, 3, QtWidgets.QTableWidgetItem(str(user[3])))
+                self.table_widget.setItem(
+                    row, 4, QtWidgets.QTableWidgetItem(str(user[4])))
+                self.table_widget.setItem(
+                    row, 5, QtWidgets.QTableWidgetItem(str(user[5])))
+                self.table_widget.setItem(
+                    row, 6, QtWidgets.QTableWidgetItem(str(user[6])))
+                self.table_widget.setItem(
+                    row, 7, QtWidgets.QTableWidgetItem(str(user[7])))
+                self.table_widget.setItem(
+                    row, 8, QtWidgets.QTableWidgetItem(str(user[8])))
+                self.table_widget.setItem(
+                    row, 9, QtWidgets.QTableWidgetItem(str(user[9])))
+                self.table_widget.setItem(
+                    row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
+                self.table_widget.setItem(
+                    row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
+                self.table_widget.setItem(
+                    row, 12, QtWidgets.QTableWidgetItem(str(user[12])))
+            self.update_textbox_info()
+
+    def update_textbox_info(self):
+        self.manv = self.table_widget.item(0, 0).text()
+        date_string = self.table_widget.item(0, 3).text()
+        datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        self.ngaysinh = datetime_obj.strftime('%d/%m/%Y')
+        self.diachi = self.table_widget.item(0, 4).text()
+        self.sodt = self.table_widget.item(0, 5).text()
+
+    def Backmenu(self):
+        window_truongphong_ThongTincanhan.closeWindow()
+        global truongphong
+        truongphong.Load_Data()
+        truongphong.showWindow()
+
+
+class TruongPhong_PhongBanDeAn:
+    def Load_Data(self):
+
+        self.datalist = Truongphong_info()
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Tab 3')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.itemlist = self.datalist.get_phongbandean_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
+
+        for item in self.itemlist:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(580)
+        scroll_area.setFixedHeight(400)
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def Backmenu(self):
+        window_truongphong_PhongBanDeAn.closeWindow()
+        global truongphong
+        truongphong.Load_Data()
+        truongphong.showWindow()
+
+
+class update_TruongPhong_canhan:
+    def Load_Data(self, manv, ngaysinh, diachi, sodt):
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Chỉnh sửa thông tin nhân viên')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(600, 420)
+
+        # Thiết lập p hiện thị MANV
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("MANV: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 40)
+
+        # Thiết lập textbox PK
+        self.textbox1 = QtWidgets.QTextEdit(self.main_window)
+        self.textbox1.setReadOnly(True)  # Thiết lập ô textbox chỉ đọc
+
+        self.textbox1.setText(manv)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox1.setGeometry(QtCore.QRect(250, 40, 150, 30))
+
+        # Thiết lập p hiện thị Tên đề án
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("NGAY SINH: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 100)
+
+        # Thiết lập textbox PK
+        self.textbox2 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox2.setGeometry(QtCore.QRect(250, 100, 150, 30))
+
+        self.textbox2.setText(ngaysinh)
+        self.textbox2.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị Ngày bắt đầu
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("DIA CHI: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 160)
+
+        self.textbox3 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox3.setGeometry(QtCore.QRect(250, 160, 150, 30))
+
+        self.textbox3.setText(diachi)
+        self.textbox3.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị SODT
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("SO DT: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 220)
+
+        self.textbox4 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox4.setGeometry(QtCore.QRect(250, 220, 150, 30))
+
+        self.textbox4.setText(sodt)
+        self.textbox4.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập button update
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(80, 35)  # đặt kích thước là 80 X 35 pixel
+        self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 300)
+        self.btn_update.clicked.connect(self.clicked_update)
+
+    def clicked_update(self):
+        manv_new = self.textbox1.toPlainText()
+        ngaysinh_new = self.textbox2.toPlainText()
+        diachi_new = self.textbox3.toPlainText()
+        sodt_new = self.textbox4.toPlainText()
+
+        controller = Truongphong_info()
+
+        result, er = controller.update_info(
+            manv_new, ngaysinh_new, diachi_new, sodt_new)
+        if result == False:
+            if er == 0:
+                MessageBoxInfo("Thông Báo", "Cập nhật thành công")
+            if er == 12899:
+                MessageBoxErr("Thông Báo", "Số ký tự quá dài")
+            if er == int('01830'):
+                MessageBoxErr("Thông Báo", "Ngày tháng năm không hợp lệ")
+
+        global window_truongphong_ThongTincanhan
+        window_truongphong_ThongTincanhan.update_info()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+
 # View: Nhân sự
 
 class Role_Nhan_su:
@@ -1556,11 +1903,29 @@ class Role_Nhan_su:
         # Hiện thị danh sách role
         self.button_role = QtWidgets.QPushButton(
             'NHANVIEN', self.main_window)
-        self.button_role.move(340, 120)
+        self.button_role.move(380, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
         self.button_role.clicked.connect(self.on_click_nv)
+
+        # Hiện thị danh sách thông tin phân công
+        self.button_assign = QtWidgets.QPushButton(
+            'Thông tin cá nhân', self.main_window)
+        self.button_assign.move(120, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_infomation)
+
+        # Hiện thị danh sách thông tin cá nhân
+        self.button_assign = QtWidgets.QPushButton(
+            'Xem phòng ban và đề án', self.main_window)
+        self.button_assign.move(380, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_Department)
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -1572,14 +1937,28 @@ class Role_Nhan_su:
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_pb(self):
+        nhansu.closeWindow()
         global pb_window
         pb_window.PHONGBAN_view()
         pb_window.showWindow()
 
     def on_click_nv(self):
+        nhansu.closeWindow()
         global pb_window2
         pb_window2.NHANVIEN_view()
         pb_window2.showWindow()
+
+    def clicked_infomation(self):
+        nhansu.closeWindow()
+        global window_nhansu_ThongTincanhan
+        window_nhansu_ThongTincanhan.Load_Data()
+        window_nhansu_ThongTincanhan.showWindow()
+
+    def clicked_Department(self):
+        nhansu.closeWindow()
+        global window_nhansu_PhongBanDeAn
+        window_nhansu_PhongBanDeAn.Load_Data()
+        window_nhansu_PhongBanDeAn.showWindow()   
 
     def showWindow(self):
         self.main_window.show()
@@ -1599,6 +1978,324 @@ class Role_Nhan_su:
         login_window.showWindow()
 
         print("Logout")
+
+
+class Nhansu_thongtincanhan:
+    def Load_Data(self):
+        self.user_list = []
+        self.datalist = NhanSu_controller()
+
+        self.manv = ''
+        self.ngaysinh = ''
+        self.diachi = ''
+        self.sodt = ''
+
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Thông tin cá nhân')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.user_list = self.datalist.get_thongtin_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(13)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MANV', 'TENNV', 'PHAI', 'NGAYSINH', 'DIACHI', 'SODT', 'LUONG', 'PHUCAP', 'VAITRO', 'MANQL', 'PHG', 'MADA', 'THOIGIAN'])
+        for item in self.user_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+            self.table_widget.setItem(
+                row_position, 6, QtWidgets.QTableWidgetItem(str(item[6])))
+            self.table_widget.setItem(
+                row_position, 7, QtWidgets.QTableWidgetItem(str(item[7])))
+            self.table_widget.setItem(
+                row_position, 8, QtWidgets.QTableWidgetItem(str(item[8])))
+            self.table_widget.setItem(
+                row_position, 9, QtWidgets.QTableWidgetItem(str(item[9])))
+            self.table_widget.setItem(
+                row_position, 10, QtWidgets.QTableWidgetItem(str(item[10])))
+            self.table_widget.setItem(
+                row_position, 11, QtWidgets.QTableWidgetItem(str(item[11])))
+            self.table_widget.setItem(
+                row_position, 12, QtWidgets.QTableWidgetItem(str(item[12])))
+        self.update_textbox_info()
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(700)
+        scroll_area.setFixedHeight(130)
+
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button sửa đề án
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
+        self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 280)
+        self.btn_update.clicked.connect(self.click_update)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def click_update(self):
+        global window_nhansu_update
+        window_nhansu_update.Load_Data(
+            self.manv, self.ngaysinh, self.diachi, self.sodt)
+        window_nhansu_update.showWindow()
+
+    def update_info(self):
+        self.user_list = self.datalist.get_thongtin_list()
+        if self.table_widget is not None:
+            self.table_widget.clearContents()
+            self.table_widget.setRowCount(0)
+            self.table_widget.setRowCount(len(self.user_list))
+            for row, user in enumerate(self.user_list):
+                self.table_widget.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(str(user[0])))
+                self.table_widget.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(str(user[1])))
+                self.table_widget.setItem(
+                    row, 2, QtWidgets.QTableWidgetItem(str(user[2])))
+                self.table_widget.setItem(
+                    row, 3, QtWidgets.QTableWidgetItem(str(user[3])))
+                self.table_widget.setItem(
+                    row, 4, QtWidgets.QTableWidgetItem(str(user[4])))
+                self.table_widget.setItem(
+                    row, 5, QtWidgets.QTableWidgetItem(str(user[5])))
+                self.table_widget.setItem(
+                    row, 6, QtWidgets.QTableWidgetItem(str(user[6])))
+                self.table_widget.setItem(
+                    row, 7, QtWidgets.QTableWidgetItem(str(user[7])))
+                self.table_widget.setItem(
+                    row, 8, QtWidgets.QTableWidgetItem(str(user[8])))
+                self.table_widget.setItem(
+                    row, 9, QtWidgets.QTableWidgetItem(str(user[9])))
+                self.table_widget.setItem(
+                    row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
+                self.table_widget.setItem(
+                    row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
+                self.table_widget.setItem(
+                    row, 12, QtWidgets.QTableWidgetItem(str(user[12])))
+            self.update_textbox_info()
+
+    def update_textbox_info(self):
+        self.manv = self.table_widget.item(0, 0).text()
+        date_string = self.table_widget.item(0, 3).text()
+        datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        self.ngaysinh = datetime_obj.strftime('%d/%m/%Y')
+        self.diachi = self.table_widget.item(0, 4).text()
+        self.sodt = self.table_widget.item(0, 5).text()
+
+    def Backmenu(self):
+        window_nhansu_ThongTincanhan.closeWindow()
+        global nhansu
+        nhansu.Load_Data()
+        nhansu.showWindow()
+
+
+class NhanSu_PhongBanDeAn:
+    def Load_Data(self):
+
+        self.datalist = Taichinh_controller()
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Tab 3')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.itemlist = self.datalist.get_phongbandean_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
+
+        for item in self.itemlist:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(580)
+        scroll_area.setFixedHeight(400)
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def Backmenu(self):
+        window_nhansu_PhongBanDeAn.closeWindow()
+        global nhansu
+        nhansu.Load_Data()
+        nhansu.showWindow()
+
+
+class update_NhanSu_canhan:
+    def Load_Data(self, manv, ngaysinh, diachi, sodt):
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Chỉnh sửa thông tin nhân viên')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(600, 420)
+
+        # Thiết lập p hiện thị MANV
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("MANV: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 40)
+
+        # Thiết lập textbox PK
+        self.textbox1 = QtWidgets.QTextEdit(self.main_window)
+        self.textbox1.setReadOnly(True)  # Thiết lập ô textbox chỉ đọc
+
+        self.textbox1.setText(manv)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox1.setGeometry(QtCore.QRect(250, 40, 150, 30))
+
+        # Thiết lập p hiện thị Tên đề án
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("NGAY SINH: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 100)
+
+        # Thiết lập textbox PK
+        self.textbox2 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox2.setGeometry(QtCore.QRect(250, 100, 150, 30))
+
+        self.textbox2.setText(ngaysinh)
+        self.textbox2.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị Ngày bắt đầu
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("DIA CHI: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 160)
+
+        self.textbox3 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox3.setGeometry(QtCore.QRect(250, 160, 150, 30))
+
+        self.textbox3.setText(diachi)
+        self.textbox3.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị SODT
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("SO DT: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 220)
+
+        self.textbox4 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox4.setGeometry(QtCore.QRect(250, 220, 150, 30))
+
+        self.textbox4.setText(sodt)
+        self.textbox4.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập button update
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(80, 35)  # đặt kích thước là 80 X 35 pixel
+        self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 300)
+        self.btn_update.clicked.connect(self.clicked_update)
+
+    def clicked_update(self):
+        manv_new = self.textbox1.toPlainText()
+        ngaysinh_new = self.textbox2.toPlainText()
+        diachi_new = self.textbox3.toPlainText()
+        sodt_new = self.textbox4.toPlainText()
+
+        controller = NhanSu_controller()
+
+        result, er = controller.update_info(
+            manv_new, ngaysinh_new, diachi_new, sodt_new)
+        if result == False:
+            if er == 0:
+                MessageBoxInfo("Thông Báo", "Cập nhật thành công")
+            if er == 12899:
+                MessageBoxErr("Thông Báo", "Số ký tự quá dài")
+            if er == int('01830'):
+                MessageBoxErr("Thông Báo", "Ngày tháng năm không hợp lệ")
+
+        global window_nhansu_ThongTincanhan
+        window_nhansu_ThongTincanhan.update_info()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
 
 
 class Phongbanview:
@@ -1700,6 +2397,14 @@ class Phongbanview:
         self.btn_update.move(180, 340)
         self.btn_update.clicked.connect(self.UpdatePB)
 
+         # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
     def UpdatePB(self):
         self.pb_controller.update_pb(
             self.cb.currentText(), self.update_txt.text(), self.uptxt.text())
@@ -1726,6 +2431,15 @@ class Phongbanview:
 
     def showWindow(self):
         self.main_window.show()
+    
+    def closeWindow(self):
+        self.main_window.hide()
+    
+    def Backmenu(self):
+        pb_window.closeWindow()
+        global nhansu
+        nhansu.Load_Data()
+        nhansu.showWindow()
 
 
 class Nhanvienview:
@@ -1923,6 +2637,14 @@ class Nhanvienview:
         self.btn_update.move(195, 500)
         self.btn_update.clicked.connect(self.UpdateNV)
 
+         # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(980, 670)
+        self.btn_back.clicked.connect(self.Backmenu)
+
     def Add_NV(self):
         self.nv_controller.add_nv(self.nv_id_txt.text(), self.nv_name_txt.text(), self.nv_sex_txt.text(), self.nv_birth_txt.text(
         ), self.nv_address_txt.text(), self.nv_phone_txt.text(), self.nv_role_txt.text(), self.nv_mgr_txt.text(), self.nv_lpb_txt.text())
@@ -1966,8 +2688,16 @@ class Nhanvienview:
     def showWindow(self):
         self.main_window.show()
 
-# View: Nhân viên
+    def closeWindow(self):
+        self.main_window.hide()
 
+    def Backmenu(self):
+        pb_window2.closeWindow()
+        global nhansu
+        nhansu.Load_Data()
+        nhansu.showWindow()
+
+# View: Nhân viên
 
 class NhanVien_view:
     def Load_Data(self):
@@ -1987,16 +2717,26 @@ class NhanVien_view:
         # thiết lập hover cursor
         self.button_staff.clicked.connect(self.clicked_information)
 
-        # Đăng xuất
+        # Hiện thị danh sách thông tin cá nhân
         self.button_assign = QtWidgets.QPushButton(
-            'Đăng Xuất', self.main_window)
+            'Xem phòng ban và đề án', self.main_window)
         self.button_assign.move(380, 180)
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_Department)
+
+         # Đăng xuất
+        self.button_logout = QtWidgets.QPushButton(
+            'Đăng xuất', self.main_window)
+        self.button_logout.move(590, 470)
+        self.button_logout.setFixedSize(80, 30)  # Thiết lập kích thước cố định
+        # thiết lập hover cursor
+        
+        self.button_logout.clicked.connect(self.Logout)
 
     def clicked_information(self):
-        Nhanvien_windown.closeWindow()
+        Nhanvien_window.closeWindow()
         global window_nhanvien_ThongTinCaNhan
         window_nhanvien_ThongTinCaNhan.Load_Data()
         window_nhanvien_ThongTinCaNhan.showWindow()
@@ -2006,6 +2746,26 @@ class NhanVien_view:
 
     def showWindow(self):
         self.main_window.show()
+    
+    def clicked_Department(self):
+        Nhanvien_window.closeWindow()
+        global window_NhanVien_PhongBanDeAn
+        window_NhanVien_PhongBanDeAn.Load_Data()
+        window_NhanVien_PhongBanDeAn.showWindow()
+
+    def Logout(self):
+
+        # Tài chính
+        global Nhanvien_window
+        Nhanvien_window.closeWindow()
+
+        global login_info
+        login_info = []
+
+        global login_window
+        login_window.showWindow()
+
+        print("Logout")
 
 
 class Nhanvien_ThongTinCaNhan:
@@ -2146,10 +2906,76 @@ class Nhanvien_ThongTinCaNhan:
         self.sodt = self.table_widget.item(0, 5).text()
 
     def Backmenu(self):
-        window_nhanvien_ThongTinCaNhan .closeWindow()
-        global Nhanvien_windown
-        Nhanvien_windown.Load_Data()
-        Nhanvien_windown.showWindow()
+        window_nhanvien_ThongTinCaNhan.closeWindow()
+        global Nhanvien_window
+        Nhanvien_window.Load_Data()
+        Nhanvien_window.showWindow()
+
+
+class NhanVien_PhongBanDeAn:
+    def Load_Data(self):
+
+        self.datalist = Taichinh_controller()
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Tab 3')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.itemlist = self.datalist.get_phongbandean_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
+
+        for item in self.itemlist:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(580)
+        scroll_area.setFixedHeight(400)
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def Backmenu(self):
+        window_NhanVien_PhongBanDeAn.closeWindow()
+        global Nhanvien_window
+        Nhanvien_window.Load_Data()
+        Nhanvien_window.showWindow()
 
 
 class update_thongtincanhan:
@@ -2261,8 +3087,6 @@ class update_thongtincanhan:
 
 
 # View: Tài chính
-
-
 class Taichinh_view:
     def Load_Data(self):
         # Khởi tạo đối tượng QMainWindow
@@ -2299,14 +3123,6 @@ class Taichinh_view:
         # thiết lập hover cursor
         self.button_assign.clicked.connect(self.clicked_Department)
 
-        # Hiện thị danh sách phòng ban đề án
-        self.button_assign = QtWidgets.QPushButton(
-            'Đăng xuất', self.main_window)
-        self.button_assign.move(380, 220)
-        # Thiết lập kích thước cố định
-        self.button_assign.setFixedSize(180, 60)
-        # thiết lập hover cursor
-
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
             'Đăng xuất', self.main_window)
@@ -2323,13 +3139,13 @@ class Taichinh_view:
         window_taichinh_ThongTinNhanVien.showWindow()
 
     def clicked_infomation(self):
-        taichinh_windown.closeWindow()
+        taichinh_window.closeWindow()
         global window_taichinh_ThongTincanhan
         window_taichinh_ThongTincanhan.Load_Data()
         window_taichinh_ThongTincanhan.showWindow()
 
     def clicked_Department(self):
-        taichinh_windown.closeWindow()
+        taichinh_window.closeWindow()
         global window_TaiChinh_PhongBanDeAn
         window_TaiChinh_PhongBanDeAn.Load_Data()
         window_TaiChinh_PhongBanDeAn.showWindow()
@@ -2365,7 +3181,7 @@ class TaiChinh_ThongTinNhanVien:
         self.main_window = QtWidgets.QMainWindow()
 
         # Thiết lập tiêu đề cho cửa sổ
-        self.main_window.setWindowTitle('Tab 1')
+        self.main_window.setWindowTitle('Quản lý nhân viên')
         # Thiết lập kích thước cho widget
         self.main_window.resize(700, 520)
 
@@ -2537,14 +3353,12 @@ class TaiChinh_ThongTinNhanVien:
                     row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
                 self.table_widget.setItem(
                     row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
-                self.table_widget.setItem(
-                    row, 12, QtWidgets.QTableWidgetItem(str(user[12])))
 
     def Backmenu(self):
         window_taichinh_ThongTinNhanVien.closeWindow()
-        global taichinh_windown
-        taichinh_windown.Load_Data()
-        taichinh_windown.showWindow()
+        global taichinh_window
+        taichinh_window.Load_Data()
+        taichinh_window.showWindow()
 
 
 class TaiChinh_ThongTinCaNhan:
@@ -2686,9 +3500,9 @@ class TaiChinh_ThongTinCaNhan:
 
     def Backmenu(self):
         window_taichinh_ThongTincanhan.closeWindow()
-        global taichinh_windown
-        taichinh_windown.Load_Data()
-        taichinh_windown.showWindow()
+        global taichinh_window
+        taichinh_window.Load_Data()
+        taichinh_window.showWindow()
 
 
 class TaiChinh_PhongBanDeAn:
@@ -2709,7 +3523,7 @@ class TaiChinh_PhongBanDeAn:
         # Đặt số lượng cột cho table widget
         self.table_widget.setColumnCount(6)
         self.table_widget.setHorizontalHeaderLabels(
-            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD', 'PHONG'])
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
 
         for item in self.itemlist:
             row_position = self.table_widget.rowCount()
@@ -2726,8 +3540,6 @@ class TaiChinh_PhongBanDeAn:
                 row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
             self.table_widget.setItem(
                 row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
-            self.table_widget.setItem(
-                row_position, 6, QtWidgets.QTableWidgetItem(str(item[6])))
         # Tạo khung cuộn
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -2866,9 +3678,8 @@ class update_nhanvien:
     def showWindow(self):
         self.main_window.show()
 
+
 # View: Đề án
-
-
 class DeAn_view:
     def Load_Data(self):
 
@@ -2882,21 +3693,31 @@ class DeAn_view:
 
         # Hiện thị danh sách thông tin đề án
         self.button_staff = QtWidgets.QPushButton(
-            'Thông tin Đề án', self.main_window)
-        self.button_staff.move(120, 180)
+            'Quản lý đề án', self.main_window)
+        self.button_staff.move(120, 120)
         self.button_staff.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         self.button_staff.clicked.connect(self.clicked_scheme)
 
-        # Đăng xuất
+        # Hiện thị danh sách thông tin phân công
         self.button_assign = QtWidgets.QPushButton(
-            'Đăng Xuất', self.main_window)
-        self.button_assign.move(380, 180)
+            'Thông tin cá nhân', self.main_window)
+        self.button_assign.move(380, 120)
         # Thiết lập kích thước cố định
         self.button_assign.setFixedSize(180, 60)
         # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_infomation)
 
-        # Đăng xuất
+        # Hiện thị danh sách thông tin cá nhân
+        self.button_assign = QtWidgets.QPushButton(
+            'Xem phòng ban và đề án', self.main_window)
+        self.button_assign.move(120, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_Department)
+
+         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
             'Đăng xuất', self.main_window)
         self.button_logout.move(590, 470)
@@ -2916,6 +3737,18 @@ class DeAn_view:
 
     def showWindow(self):
         self.main_window.show()
+
+    def clicked_infomation(self):
+        dean_window.closeWindow()
+        global window_dean_ThongTincanhan
+        window_dean_ThongTincanhan.Load_Data()
+        window_dean_ThongTincanhan.showWindow()
+
+    def clicked_Department(self):
+        dean_window.closeWindow()
+        global window_dean_PhongBanDeAn
+        window_dean_PhongBanDeAn.Load_Data()
+        window_dean_PhongBanDeAn.showWindow()   
 
     def Logout(self):
         # Đề án
@@ -3082,12 +3915,19 @@ class DanhSachDeAn_view:
 
     def clicked_delete(self):
         MADA_remove = self.MADA
-        controller = DeAn_controller()
-        result, er = controller.delete_info(MADA_remove)
-        if result == False:
-            if er == int('02292'):
-                MessageBoxErr("Thông báo", 'Không thể xóa')
+        deancontroller = DeAn_controller()
+        temp, er1 = deancontroller.remove_assignment(MADA_remove)
 
+        if er1 == 0:
+            result, er = deancontroller.delete_info(MADA_remove)
+            if result == False:
+                if er == int('02292'):
+                    MessageBoxErr("Thông báo", 'Không thể xóa')
+                if er == 0:
+                    MessageBoxInfo("Thông báo", 'Xóa thành công')
+        else:
+            MessageBoxInfo("Thông báo", 'Lỗi')
+            return 
         self.update_info()
 
     def closeWindow(self):
@@ -3183,7 +4023,13 @@ class add_dean:
         controller = DeAn_controller()
         existing_mada_count = controller.count_existing_mada()
         count = existing_mada_count[0][0]
-        mada_new = 'DA' + str(count + 1)
+
+        if count <= 9:
+            mada_new = 'DA00' + str(count + 1)
+        elif count <= 99:
+            mada_new = 'DA0' + str(count + 1)
+        else:
+            mada_new = 'DA' + str(count + 1) 
         tenda_new = self.textbox1.toPlainText()
         ngaybd_new = self.textbox2.toPlainText()
         phong_new = self.textbox3.toPlainText()
@@ -3325,9 +4171,325 @@ class update_dean:
     def showWindow(self):
         self.main_window.show()
 
+
+class TruongDA_ThongTinCaNhan:
+    def Load_Data(self):
+        self.user_list = []
+        self.datalist = DeAn_controller()
+
+        self.manv = ''
+        self.ngaysinh = ''
+        self.diachi = ''
+        self.sodt = ''
+
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Thông tin cá nhân')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.user_list = self.datalist.get_thongtin_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(13)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MANV', 'TENNV', 'PHAI', 'NGAYSINH', 'DIACHI', 'SODT', 'LUONG', 'PHUCAP', 'VAITRO', 'MANQL', 'PHG', 'MADA', 'THOIGIAN'])
+        for item in self.user_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+            self.table_widget.setItem(
+                row_position, 6, QtWidgets.QTableWidgetItem(str(item[6])))
+            self.table_widget.setItem(
+                row_position, 7, QtWidgets.QTableWidgetItem(str(item[7])))
+            self.table_widget.setItem(
+                row_position, 8, QtWidgets.QTableWidgetItem(str(item[8])))
+            self.table_widget.setItem(
+                row_position, 9, QtWidgets.QTableWidgetItem(str(item[9])))
+            self.table_widget.setItem(
+                row_position, 10, QtWidgets.QTableWidgetItem(str(item[10])))
+            self.table_widget.setItem(
+                row_position, 11, QtWidgets.QTableWidgetItem(str(item[11])))
+            self.table_widget.setItem(
+                row_position, 12, QtWidgets.QTableWidgetItem(str(item[12])))
+        self.update_textbox_info()
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(700)
+        scroll_area.setFixedHeight(130)
+
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button sửa đề án
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
+        self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 280)
+        self.btn_update.clicked.connect(self.click_update)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def click_update(self):
+        global window_dean_update
+        window_dean_update.Load_Data(
+            self.manv, self.ngaysinh, self.diachi, self.sodt)
+        window_dean_update.showWindow()
+
+    def update_info(self):
+        self.user_list = self.datalist.get_thongtin_list()
+        if self.table_widget is not None:
+            self.table_widget.clearContents()
+            self.table_widget.setRowCount(0)
+            self.table_widget.setRowCount(len(self.user_list))
+            for row, user in enumerate(self.user_list):
+                self.table_widget.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(str(user[0])))
+                self.table_widget.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(str(user[1])))
+                self.table_widget.setItem(
+                    row, 2, QtWidgets.QTableWidgetItem(str(user[2])))
+                self.table_widget.setItem(
+                    row, 3, QtWidgets.QTableWidgetItem(str(user[3])))
+                self.table_widget.setItem(
+                    row, 4, QtWidgets.QTableWidgetItem(str(user[4])))
+                self.table_widget.setItem(
+                    row, 5, QtWidgets.QTableWidgetItem(str(user[5])))
+                self.table_widget.setItem(
+                    row, 6, QtWidgets.QTableWidgetItem(str(user[6])))
+                self.table_widget.setItem(
+                    row, 7, QtWidgets.QTableWidgetItem(str(user[7])))
+                self.table_widget.setItem(
+                    row, 8, QtWidgets.QTableWidgetItem(str(user[8])))
+                self.table_widget.setItem(
+                    row, 9, QtWidgets.QTableWidgetItem(str(user[9])))
+                self.table_widget.setItem(
+                    row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
+                self.table_widget.setItem(
+                    row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
+                self.table_widget.setItem(
+                    row, 12, QtWidgets.QTableWidgetItem(str(user[12])))
+            self.update_textbox_info()
+
+    def update_textbox_info(self):
+        self.manv = self.table_widget.item(0, 0).text()
+        date_string = self.table_widget.item(0, 3).text()
+        datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        self.ngaysinh = datetime_obj.strftime('%d/%m/%Y')
+        self.diachi = self.table_widget.item(0, 4).text()
+        self.sodt = self.table_widget.item(0, 5).text()
+
+    def Backmenu(self):
+        window_dean_ThongTincanhan.closeWindow()
+        global dean_window
+        dean_window.Load_Data()
+        dean_window.showWindow()
+
+
+class TruongDA_PhongBanDeAn:
+    def Load_Data(self):
+
+        self.datalist = DeAn_controller()
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Phòng ban đề án')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.itemlist = self.datalist.get_phongbandean_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
+
+        for item in self.itemlist:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(580)
+        scroll_area.setFixedHeight(400)
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def Backmenu(self):
+
+        window_dean_PhongBanDeAn.closeWindow()
+        global dean_window
+
+        dean_window.Load_Data()
+        dean_window.showWindow()
+
+
+class update_TruongDA_canhan:
+    def Load_Data(self, manv, ngaysinh, diachi, sodt):
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Chỉnh sửa thông tin nhân viên')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(600, 420)
+
+        # Thiết lập p hiện thị MANV
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("MANV: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 40)
+
+        # Thiết lập textbox PK
+        self.textbox1 = QtWidgets.QTextEdit(self.main_window)
+        self.textbox1.setReadOnly(True)  # Thiết lập ô textbox chỉ đọc
+
+        self.textbox1.setText(manv)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox1.setGeometry(QtCore.QRect(250, 40, 150, 30))
+
+        # Thiết lập p hiện thị Tên đề án
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("NGAY SINH: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 100)
+
+        # Thiết lập textbox PK
+        self.textbox2 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox2.setGeometry(QtCore.QRect(250, 100, 150, 30))
+
+        self.textbox2.setText(ngaysinh)
+        self.textbox2.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị Ngày bắt đầu
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("DIA CHI: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 160)
+
+        self.textbox3 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox3.setGeometry(QtCore.QRect(250, 160, 150, 30))
+
+        self.textbox3.setText(diachi)
+        self.textbox3.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị SODT
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("SO DT: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 220)
+
+        self.textbox4 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox4.setGeometry(QtCore.QRect(250, 220, 150, 30))
+
+        self.textbox4.setText(sodt)
+        self.textbox4.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập button update
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(80, 35)  # đặt kích thước là 80 X 35 pixel
+        self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 300)
+        self.btn_update.clicked.connect(self.clicked_update)
+
+    def clicked_update(self):
+        manv_new = self.textbox1.toPlainText()
+        ngaysinh_new = self.textbox2.toPlainText()
+        diachi_new = self.textbox3.toPlainText()
+        sodt_new = self.textbox4.toPlainText()
+        controller = DeAn_controller()
+        result, er = controller.update_info(
+            manv_new, ngaysinh_new, diachi_new, sodt_new)
+        if result == False:
+            if er == 0:
+                MessageBoxInfo("Thông Báo", "Cập nhật thành công")
+            if er == 12899:
+                MessageBoxErr("Thông Báo", "Số ký tự quá dài")
+            if er == int('01830'):
+                MessageBoxErr("Thông Báo", "Ngày tháng năm không hợp lệ")
+
+        global window_dean_ThongTincanhan
+        window_dean_ThongTincanhan.update_info()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
 # View: Quản lý trực tiếp
-
-
 class Role_QLTructiep:
     def Load_Data(self):
         # Khởi tạo đối tượng QMainWindow
@@ -3350,11 +4512,29 @@ class Role_QLTructiep:
         # Hiện thị danh sách role
         self.button_role = QtWidgets.QPushButton(
             'NHANVIEN', self.main_window)
-        self.button_role.move(340, 120)
+        self.button_role.move(380, 120)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
         self.button_role.clicked.connect(self.on_click_nv)
+
+        # Hiện thị danh sách thông tin phân công
+        self.button_assign = QtWidgets.QPushButton(
+            'Thông tin cá nhân', self.main_window)
+        self.button_assign.move(120, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_infomation)
+
+        # Hiện thị danh sách thông tin cá nhân
+        self.button_assign = QtWidgets.QPushButton(
+            'Xem phòng ban và đề án', self.main_window)
+        self.button_assign.move(380, 240)
+        # Thiết lập kích thước cố định
+        self.button_assign.setFixedSize(180, 60)
+        # thiết lập hover cursor
+        self.button_assign.clicked.connect(self.clicked_Department)
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -3366,14 +4546,28 @@ class Role_QLTructiep:
         self.button_logout.clicked.connect(self.Logout)
 
     def on_click_pc(self):
+        qltructiep.closeWindow()
         global pc_window
         pc_window.PHANCONG_view()
         pc_window.showWindow()
 
     def on_click_nv(self):
+        qltructiep.closeWindow()
         global pc_window2
         pc_window2.NHANVIEN_view()
         pc_window2.showWindow()
+
+    def clicked_infomation(self):
+        qltructiep.closeWindow()
+        global window_qltructiep_ThongTincanhan
+        window_qltructiep_ThongTincanhan.Load_Data()
+        window_qltructiep_ThongTincanhan.showWindow()
+
+    def clicked_Department(self):
+        qltructiep.closeWindow()
+        global window_qltructiep_PhongBanDeAn
+        window_qltructiep_PhongBanDeAn.Load_Data()
+        window_qltructiep_PhongBanDeAn.showWindow()   
 
     def showWindow(self):
         self.main_window.show()
@@ -3427,6 +4621,341 @@ class QL_Phancongview:
 
         self.main_window.resize(700, 520)
 
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def Backmenu(self):
+        pc_window.closeWindow()
+        global qltructiep
+        qltructiep.Load_Data()
+        qltructiep.showWindow()
+
+
+class QLTrucTiep_ThongTinCaNhan:
+    def Load_Data(self):
+        self.user_list = []
+        self.datalist = QLTructiep_controller()
+
+        self.manv = ''
+        self.ngaysinh = ''
+        self.diachi = ''
+        self.sodt = ''
+
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Thông tin cá nhân')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.user_list = self.datalist.get_thongtin_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(13)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MANV', 'TENNV', 'PHAI', 'NGAYSINH', 'DIACHI', 'SODT', 'LUONG', 'PHUCAP', 'VAITRO', 'MANQL', 'PHG', 'MADA', 'THOIGIAN'])
+        for item in self.user_list:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+            self.table_widget.setItem(
+                row_position, 6, QtWidgets.QTableWidgetItem(str(item[6])))
+            self.table_widget.setItem(
+                row_position, 7, QtWidgets.QTableWidgetItem(str(item[7])))
+            self.table_widget.setItem(
+                row_position, 8, QtWidgets.QTableWidgetItem(str(item[8])))
+            self.table_widget.setItem(
+                row_position, 9, QtWidgets.QTableWidgetItem(str(item[9])))
+            self.table_widget.setItem(
+                row_position, 10, QtWidgets.QTableWidgetItem(str(item[10])))
+            self.table_widget.setItem(
+                row_position, 11, QtWidgets.QTableWidgetItem(str(item[11])))
+            self.table_widget.setItem(
+                row_position, 12, QtWidgets.QTableWidgetItem(str(item[12])))
+        self.update_textbox_info()
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(700)
+        scroll_area.setFixedHeight(130)
+
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button sửa đề án
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(100, 35)  # đặt kích thước là 40x40 pixel
+        self.btn_update.setStyleSheet('background-color: #999999; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 280)
+        self.btn_update.clicked.connect(self.click_update)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def click_update(self):
+        global window_qltructiep_update
+        window_qltructiep_update.Load_Data(
+            self.manv, self.ngaysinh, self.diachi, self.sodt)
+        window_qltructiep_update.showWindow()
+
+    def update_info(self):
+        self.user_list = self.datalist.get_thongtin_list()
+        if self.table_widget is not None:
+            self.table_widget.clearContents()
+            self.table_widget.setRowCount(0)
+            self.table_widget.setRowCount(len(self.user_list))
+            for row, user in enumerate(self.user_list):
+                self.table_widget.setItem(
+                    row, 0, QtWidgets.QTableWidgetItem(str(user[0])))
+                self.table_widget.setItem(
+                    row, 1, QtWidgets.QTableWidgetItem(str(user[1])))
+                self.table_widget.setItem(
+                    row, 2, QtWidgets.QTableWidgetItem(str(user[2])))
+                self.table_widget.setItem(
+                    row, 3, QtWidgets.QTableWidgetItem(str(user[3])))
+                self.table_widget.setItem(
+                    row, 4, QtWidgets.QTableWidgetItem(str(user[4])))
+                self.table_widget.setItem(
+                    row, 5, QtWidgets.QTableWidgetItem(str(user[5])))
+                self.table_widget.setItem(
+                    row, 6, QtWidgets.QTableWidgetItem(str(user[6])))
+                self.table_widget.setItem(
+                    row, 7, QtWidgets.QTableWidgetItem(str(user[7])))
+                self.table_widget.setItem(
+                    row, 8, QtWidgets.QTableWidgetItem(str(user[8])))
+                self.table_widget.setItem(
+                    row, 9, QtWidgets.QTableWidgetItem(str(user[9])))
+                self.table_widget.setItem(
+                    row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
+                self.table_widget.setItem(
+                    row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
+                self.table_widget.setItem(
+                    row, 12, QtWidgets.QTableWidgetItem(str(user[12])))
+            self.update_textbox_info()
+
+    def update_textbox_info(self):
+        self.manv = self.table_widget.item(0, 0).text()
+        date_string = self.table_widget.item(0, 3).text()
+        datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        self.ngaysinh = datetime_obj.strftime('%d/%m/%Y')
+        self.diachi = self.table_widget.item(0, 4).text()
+        self.sodt = self.table_widget.item(0, 5).text()
+
+    def Backmenu(self):
+        window_qltructiep_ThongTincanhan.closeWindow()
+        global qltructiep
+        qltructiep.Load_Data()
+        qltructiep.showWindow()
+
+
+class QLTrucTiep_PhongBanDeAn:
+    def Load_Data(self):
+
+        self.datalist = QLTructiep_controller()
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Phòng ban đề án')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(700, 520)
+        self.itemlist = self.datalist.get_phongbandean_list()
+
+        # Khởi tạo table widget để hiển thị danh sách người dùng
+        self.table_widget = QtWidgets.QTableWidget()
+        # Đặt số lượng cột cho table widget
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ['MAPB', 'TENPB', 'TRPHG', 'MADA', 'TENDA', 'NGAYBD'])
+
+        for item in self.itemlist:
+            row_position = self.table_widget.rowCount()
+            self.table_widget.insertRow(row_position)
+            self.table_widget.setItem(
+                row_position, 0, QtWidgets.QTableWidgetItem(str(item[0])))
+            self.table_widget.setItem(
+                row_position, 1, QtWidgets.QTableWidgetItem(str(item[1])))
+            self.table_widget.setItem(
+                row_position, 2, QtWidgets.QTableWidgetItem(str(item[2])))
+            self.table_widget.setItem(
+                row_position, 3, QtWidgets.QTableWidgetItem(str(item[3])))
+            self.table_widget.setItem(
+                row_position, 4, QtWidgets.QTableWidgetItem(str(item[4])))
+            self.table_widget.setItem(
+                row_position, 5, QtWidgets.QTableWidgetItem(str(item[5])))
+        # Tạo khung cuộn
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFixedWidth(580)
+        scroll_area.setFixedHeight(400)
+        # Đặt bảng trong khung cuộn
+        scroll_area.setWidget(self.table_widget)
+        # # Thêm tab_widget vào QMainWindow
+        self.main_window.setCentralWidget(scroll_area)
+
+        # Thiết lập button back
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(610, 470)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def closeWindow(self):
+        self.main_window.hide()
+
+    def showWindow(self):
+        self.main_window.show()
+
+    def Backmenu(self):
+
+        window_qltructiep_PhongBanDeAn.closeWindow()
+        global qltructiep
+
+        qltructiep.Load_Data()
+        qltructiep.showWindow()
+
+
+class update_QLtructiep_canhan:
+    def Load_Data(self, manv, ngaysinh, diachi, sodt):
+        # Khởi tạo đối tượng QMainWindow
+        self.main_window = QtWidgets.QMainWindow()
+
+        # Thiết lập tiêu đề cho cửa sổ
+        self.main_window.setWindowTitle('Chỉnh sửa thông tin nhân viên')
+        # Thiết lập kích thước cho widget
+        self.main_window.resize(600, 420)
+
+        # Thiết lập p hiện thị MANV
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("MANV: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 40)
+
+        # Thiết lập textbox PK
+        self.textbox1 = QtWidgets.QTextEdit(self.main_window)
+        self.textbox1.setReadOnly(True)  # Thiết lập ô textbox chỉ đọc
+
+        self.textbox1.setText(manv)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox1.setGeometry(QtCore.QRect(250, 40, 150, 30))
+
+        # Thiết lập p hiện thị Tên đề án
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("NGAY SINH: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 100)
+
+        # Thiết lập textbox PK
+        self.textbox2 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox2.setGeometry(QtCore.QRect(250, 100, 150, 30))
+
+        self.textbox2.setText(ngaysinh)
+        self.textbox2.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị Ngày bắt đầu
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("DIA CHI: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 160)
+
+        self.textbox3 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox3.setGeometry(QtCore.QRect(250, 160, 150, 30))
+
+        self.textbox3.setText(diachi)
+        self.textbox3.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập p hiện thị SODT
+        self.text_Manv = QtWidgets.QLabel(self.main_window)
+        self.text_Manv.setText("SO DT: ")
+        self.text_Manv.setStyleSheet("font-size: 15px;")
+        self.text_Manv.adjustSize()
+        self.text_Manv.move(100, 220)
+
+        self.textbox4 = QtWidgets.QTextEdit(self.main_window)
+
+        # Thiết lập kích thước và vị trí cho ô textbox
+        self.textbox4.setGeometry(QtCore.QRect(250, 220, 150, 30))
+
+        self.textbox4.setText(sodt)
+        self.textbox4.setStyleSheet("color: #6C6B6A")
+
+        # Thiết lập button update
+        self.btn_update = QtWidgets.QPushButton(self.main_window)
+        self.btn_update.setFixedSize(80, 35)  # đặt kích thước là 80 X 35 pixel
+        self.btn_update.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_update.setText("UPDATE")
+        self.btn_update.move(280, 300)
+        self.btn_update.clicked.connect(self.clicked_update)
+
+    def clicked_update(self):
+        manv_new = self.textbox1.toPlainText()
+        ngaysinh_new = self.textbox2.toPlainText()
+        diachi_new = self.textbox3.toPlainText()
+        sodt_new = self.textbox4.toPlainText()
+        controller = QLTructiep_controller()
+        result, er = controller.update_info(
+            manv_new, ngaysinh_new, diachi_new, sodt_new)
+        if result == False:
+            if er == 0:
+                MessageBoxInfo("Thông Báo", "Cập nhật thành công")
+            if er == 12899:
+                MessageBoxErr("Thông Báo", "Số ký tự quá dài")
+            if er == int('01830'):
+                MessageBoxErr("Thông Báo", "Ngày tháng năm không hợp lệ")
+
+        global window_qltructiep_ThongTincanhan
+        window_qltructiep_ThongTincanhan.update_info()
+
+    def closeWindow(self):
+        self.main_window.hide()
+
     def showWindow(self):
         self.main_window.show()
 
@@ -3479,12 +5008,26 @@ class QL_Nhanvienview:
 
         self.main_window.resize(1080, 720)
 
+        self.btn_back = QtWidgets.QPushButton(self.main_window)
+        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
+        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
+        self.btn_back.setText("BACK")
+        self.btn_back.move(990, 660)
+        self.btn_back.clicked.connect(self.Backmenu)
+
+    def Backmenu(self):
+        pc_window2.closeWindow()
+        global qltructiep
+        qltructiep.Load_Data()
+        qltructiep.showWindow()
+
     def showWindow(self):
         self.main_window.show()
 
+    def closeWindow(self):
+        self.main_window.hide()
+
 # View: DBA
-
-
 class DBA_MainWindown:
     def Load_Data(self):
         # Khởi tạo đối tượng QMainWindow
@@ -3498,7 +5041,7 @@ class DBA_MainWindown:
         # Hiện thị danh sách user
         self.button_user = QtWidgets.QPushButton(
             'Danh sách user', self.main_window)
-        self.button_user.move(120, 120)
+        self.button_user.move(120, 100)
         self.button_user.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
@@ -3507,7 +5050,7 @@ class DBA_MainWindown:
         # Hiện thị danh sách role
         self.button_role = QtWidgets.QPushButton(
             'Danh sách role', self.main_window)
-        self.button_role.move(340, 120)
+        self.button_role.move(380, 100)
         self.button_role.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
@@ -3526,13 +5069,13 @@ class DBA_MainWindown:
         # Hiện thị danh sách quyền của role/user
         self.button_table = QtWidgets.QPushButton(
             'Danh sách table', self.main_window)
-        self.button_table.move(340, 220)
+        self.button_table.move(380, 220)
         self.button_table.setFixedSize(180, 60)  # Thiết lập kích thước cố định
 
         # Hiện thị danh sách quyền của role/user
         self.button_pri1 = QtWidgets.QPushButton(
             'Danh sách quyền', self.main_window)
-        self.button_pri1.move(120, 320)
+        self.button_pri1.move(120, 340)
         self.button_pri1.setFixedSize(180, 60)  # Thiết lập kích thước cố định
         # thiết lập hover cursor
         
@@ -3540,15 +5083,6 @@ class DBA_MainWindown:
 
         # thiết lập hover cursor
         self.button_table.clicked.connect(self.on_click_table)
-
-        # Hiện thị danh sách role
-        self.button_audit = QtWidgets.QPushButton(
-            'Auditing', self.main_window)
-        self.button_audit.move(340, 320)
-        self.button_audit.setFixedSize(180, 60)  # Thiết lập kích thước cố định
-        # thiết lập hover cursor
-        
-        self.button_audit.clicked.connect(self.on_click_audit)
 
         # Đăng xuất
         self.button_logout = QtWidgets.QPushButton(
@@ -3589,12 +5123,6 @@ class DBA_MainWindown:
         dba_pri_window.Load_Data()
         dba_pri_window.showWindow()
 
-    def on_click_audit(self):
-        dba_main_window.closeWindow()
-        global dba_audit_window
-        dba_audit_window.Load_Data()
-        dba_audit_window.showWindow()
-
     def closeWindow(self):
         self.main_window.hide()
 
@@ -3613,7 +5141,7 @@ class DBA_MainWindown:
         login_window.showWindow()
 
         print("Logout")
-
+ 
 
 class DBA_PriView:
     def Load_Data(self):
@@ -5297,88 +6825,7 @@ class DBA_privilegesView:
         dba_main_window.showWindow()
 
 
-class DBA_auditView:
-    def Load_Data(self):
-        self.audit_controller = Audit_Controller()
-        self.main_window = QtWidgets.QMainWindow()
-
-        # Thiết lập tiêu đề cho cửa sổ
-        self.main_window.setWindowTitle('Auditing')
-        # Thiết lập kích thước cho widget
-        self.main_window.resize(700, 520)
-
-        # Thiết lập p hiện thị nhập user
-        self.user_name = QtWidgets.QLabel(self.main_window)
-        self.user_name.setText("Nhập UserName: ")
-        self.user_name.setStyleSheet("font-size: 16px;")
-        self.user_name.adjustSize()
-        self.user_name.move(440, 20)
-
-        # Thiết lập ô nhập input
-        self.search_bar = QtWidgets.QLineEdit(self.main_window)
-        self.search_bar.setPlaceholderText("Search...")
-        self.search_bar.setStyleSheet("QLineEdit { padding-left: 16px; }")
-        self.search_bar.setFixedWidth(160)
-        self.search_bar.setFixedHeight(30)
-        self.search_bar.move(440, 60)
-
-        # Thiết lập button search
-        self.btn_search = QtWidgets.QPushButton(self.main_window)
-        self.btn_search.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
-        self.btn_search.setStyleSheet('background-color: #999999; color: #fff')
-        self.btn_search.setText("TÌM")
-        self.btn_search.clicked.connect(self.clicked_search)
-        self.btn_search.move(440, 100)
-
-        # Thiết lập button back
-        self.btn_back = QtWidgets.QPushButton(self.main_window)
-        self.btn_back.setFixedSize(60, 30)  # đặt kích thước là 40x40 pixel
-        self.btn_back.setStyleSheet('background-color: #3450D9; color: #fff')
-        self.btn_back.setText("BACK")
-        self.btn_back.move(610, 470)
-
-        self.btn_back.clicked.connect(self.Backmenu)
-
-        self.table_widget = QtWidgets.QTableWidget()
-        self.table_widget.setColumnCount(3)
-        self.table_widget.setHorizontalHeaderLabels(
-            ['Hành động', 'Bảng', 'Thời gian'])
-    
-        self.table_widget.setColumnWidth(2, 250)
-        self.scroll_area = QtWidgets.QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setFixedWidth(420)
-        self.scroll_area.setFixedHeight(450)
-        self.scroll_area.setWidget(self.table_widget)
-        self.main_window.setCentralWidget(self.scroll_area)
-
-    def closeWindow(self):
-        self.main_window.hide()
-
-    def showWindow(self):
-        self.main_window.show()
-
-    def clicked_search(self):
-        self.audit_list = self.audit_controller.display_user_audit(self.search_bar.text())
-        self.table_widget.clearContents()
-        self.table_widget.setRowCount(0)
-        #self.table_widget.setRowCount(len(self.audit_list))
-        for user in self.audit_list:
-                row_position = self.table_widget.rowCount()
-                self.table_widget.insertRow(row_position)
-                self.table_widget.setItem(
-                    row_position, 0, QtWidgets.QTableWidgetItem(str(user[0])))
-                self.table_widget.setItem(
-                    row_position, 1, QtWidgets.QTableWidgetItem(str(user[1])))
-                self.table_widget.setItem(
-                    row_position, 2, QtWidgets.QTableWidgetItem(str(user[2])))
-
-    def Backmenu(self):
-        dba_audit_window.closeWindow()
-        dba_main_window.showWindow()
-
 #################################################################
-
 
 # Variable
 login_window = LoginWindow()
@@ -5387,23 +6834,32 @@ login_window = LoginWindow()
 truongphong = Role_TruongPhong()
 assignment_list = AssignmentList_View()
 TruongPhong_ListStaff_window = TruongPhong_ListStaff_View()
+window_truongphong_ThongTincanhan = TruongPhong_thongtincanhan()
+window_truongphong_PhongBanDeAn = TruongPhong_PhongBanDeAn()
+window_truongphong_update = update_TruongPhong_canhan()
 
 # Nhân sự
 nhansu = Role_Nhan_su()
 pb_window = Phongbanview()
 pb_window2 = Nhanvienview()
+window_nhansu_ThongTincanhan = Nhansu_thongtincanhan()
+window_nhansu_PhongBanDeAn = NhanSu_PhongBanDeAn()
+window_nhansu_update = update_NhanSu_canhan()
 
 # Nhân viên
-Nhanvien_windown = NhanVien_view()
-window_ThongTinCaNhan = ThongTinCaNhan()
+Nhanvien_window = NhanVien_view()
 window_nhanvien_ThongTinCaNhan = Nhanvien_ThongTinCaNhan()
 window_nhanvien_update = update_thongtincanhan()
+window_NhanVien_PhongBanDeAn = NhanVien_PhongBanDeAn()
 
 # Đề án
 dean_window = DeAn_view()
 window_danhsachdean = DanhSachDeAn_view()
 window_dean_add = add_dean()
 window_dean_update = update_dean()
+window_dean_ThongTincanhan = TruongDA_ThongTinCaNhan()
+window_dean_PhongBanDeAn = TruongDA_PhongBanDeAn()
+window_dean_update = update_TruongDA_canhan()
 
 # Tài chính
 taichinh_window = Taichinh_view()
@@ -5416,6 +6872,9 @@ window_taichinh_update = update_nhanvien()
 qltructiep = Role_QLTructiep()
 pc_window = QL_Phancongview()
 pc_window2 = QL_Nhanvienview()
+window_qltructiep_ThongTincanhan = QLTrucTiep_ThongTinCaNhan()
+window_qltructiep_PhongBanDeAn = QLTrucTiep_PhongBanDeAn()
+window_qltructiep_update = update_QLtructiep_canhan()
 login_info = []
 
 # DBA
@@ -5425,23 +6884,21 @@ dba_user_window = DBA_UserList()
 dba_privileges_window = DBA_privilegesView()
 dba_table_window = DBA_TableView()
 dba_pri_window = DBA_PriView()
-dba_audit_window = DBA_auditView()
 
 #################################################################
 
-
 def main():
-    lib_dir = r"C:\thong\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
-    # lib_dir = "C:\oclient\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
-    global oracle_client_initialized
-    oracle_client_initialized = False
-    if not oracle_client_initialized:
-        try:
-            cx_Oracle.init_oracle_client(lib_dir=lib_dir)
-            oracle_client_initialized = True
-        except Exception as err:
-            print("Error initializing Oracle Client:", err)
-            sys.exit(1)
+    # lib_dir = r"C:\thong\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
+    # # lib_dir = "C:\oclient\instantclient-basic-windows.x64-21.9.0.0.0dbru\instantclient_21_9"
+    # global oracle_client_initialized
+    # oracle_client_initialized = False
+    # if not oracle_client_initialized:
+    #     try:
+    #         cx_Oracle.init_oracle_client(lib_dir=lib_dir)
+    #         oracle_client_initialized = True
+    #     except Exception as err:
+    #         print("Error initializing Oracle Client:", err)
+    #         sys.exit(1)
     app = QtWidgets.QApplication(sys.argv)
     global login_window
     login_window.Load_Data()
