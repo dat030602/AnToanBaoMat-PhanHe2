@@ -107,7 +107,7 @@ BEGIN
         v_label := v_label || 'MB1:';
     ELSIF p_linhvuc = 'SANXUAT' THEN
         v_label := v_label || 'SX:';
-    ELSE
+    ELSIF p_linhvuc = 'GIACONG' THEN
         v_label := v_label || 'GC:';
     END IF;
     
