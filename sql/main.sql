@@ -529,7 +529,64 @@ BEGIN
 END;
 
 /
-select * from nhanvien;
-select * from unified_audit_trail;
-SELECT dbusername, action_name, object_name, event_timestamp FROM unified_audit_trail WHERE OBJECT_SCHEMA='NVQUANTRI' ORDER BY EVENT_TIMESTAMP;
-SELECT dbusername, action_name, object_name, event_timestamp FROM unified_audit_trail WHERE dbusername='NVQUANTRI' ORDER BY EVENT_TIMESTAMP;
+--------------------b. AUDIT LUONG, PHUCAP khi nguoi khac truy cap--------------------
+
+BEGIN
+    DBMS_FGA.DROP_POLICY(
+        object_schema   =>  'nvquantri',
+        object_name     =>  'NHANVIEN',
+        policy_name     =>  'CHECK_LUONG_PHUCAP_ON_NHANVIEN');
+END;
+/
+
+
+--Tao policy
+BEGIN
+    DBMS_FGA.ADD_POLICY(
+        object_schema   =>  'nvquantri',
+        object_name     =>  'NHANVIEN',
+        policy_name     =>  'CHECK_LUONG_PHUCAP_ON_NHANVIEN',
+        enable          =>   TRUE,
+        statement_types =>  'SELECT',
+        audit_column    =>  'LUONG, PHUCAP',
+        audit_trail     =>  DBMS_FGA.DB + DBMS_FGA.EXTENDED,
+        audit_condition => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') != USERNAME');
+END;
+/
+--De xem audit
+--SELECT DBUID, LSQLTEXT, NTIMESTAMP# FROM sys.FGA_LOG$ WHERE POLICYNAME = 'CHECK_LUONG_PHUCAP_ON_NHANVIEN';
+--------------------c. AUDIT nguoi khong thuoc TAICHINH nhung cap nhat thanh cong LUONG, PHUCAP--------------------
+
+BEGIN
+    DBMS_FGA.DROP_POLICY(
+        object_schema   =>  'nvquantri',
+        object_name     =>  'NHANVIEN',
+        policy_name     =>  'CHECK_UPDATE_ON_LUONG_PHUCAP');
+END;
+/
+
+--Tao policy
+BEGIN
+    DBMS_FGA.ADD_POLICY(
+        object_schema   =>  'nvquantri',
+        object_name     =>  'NHANVIEN',
+        policy_name     =>  'CHECK_UPDATE_ON_LUONG_PHUCAP',
+        enable          =>   TRUE,
+        statement_types =>  'UPDATE',
+        audit_column    =>  'LUONG, PHUCAP',
+        audit_trail     =>  DBMS_FGA.DB + DBMS_FGA.EXTENDED,
+        audit_condition => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') NOT IN (SELECT grantee FROM dba_role_privs WHERE granted_role = ''TAICHINH'')');
+END;
+/
+
+--4c
+BEGIN
+    dbms_fga.ADD_POLICY (
+        OBJECT_SCHEMA => 'NVQUANTRI',
+        OBJECT_NAME => 'NHANVIEN',
+        POLICY_NAME => 'AUDIT_UPDATE_LUONG_PHUCAP',
+        AUDIT_COLUMN => 'LUONG, PHUCAP',
+        AUDIT_CONDITION => 'VAITRO <> ''TAICHINH''',
+        STATEMENT_TYPES => 'UPDATE',
+        ENABLE => TRUE);
+END;

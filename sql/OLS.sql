@@ -161,8 +161,3 @@ BEGIN
     SA_USER_ADMIN.SET_USER_LABELS('region_policy','KELLYSMITH','GD:MB1,SX,GC:MB'); --GIAM DOC
 END;
 /
-INSERT INTO THONGBAO (id, noidung, khuvuc, linhvuc, vaitro, region_label)
-VALUES ( 12, 'Thong bao 12', 'MIENBAC', 'SANXUAT', 'GIAMDOC', get_thongbao_label('GIAMDOC','SANXUAT','MIENBAC'));
-
-INSERT INTO THONGBAO (id, noidung, khuvuc, linhvuc, vaitro, region_label)
-VALUES ( {id}, {noidung}, {khuvuc}, {linhvuc}, {vaitro}, get_thongbao_label({vaitro},{linhvuc},{khuvuc}));
