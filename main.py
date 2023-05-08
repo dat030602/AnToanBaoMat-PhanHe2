@@ -65,7 +65,7 @@ class RoleController:
 
     def Recall_Role_Table(self, role_name, table_name, privilege):
         result = execute_query(
-            login_info[0], login_info[1], 'REVOKE {0} ON sys.{1} FROM {2}'.format(privilege, table_name, role_name))
+            login_info[0], login_info[1], 'REVOKE {0} ON {1} FROM {2}'.format(privilege, table_name, role_name))
 
         return result
 
@@ -88,7 +88,7 @@ class RoleController:
 class table_Controller:
     def display_table_list(self):
         result = execute_query(
-            login_info[0], login_info[1], "SELECT Owner, table_name FROM all_tables WHERE table_name = '" + "NHANVIEN'")
+            login_info[0], login_info[1], "SELECT table_name FROM all_tables WHERE owner = 'NVQUANTRI' UNION ALL SELECT view_name FROM user_views")
         return result
 
     def Grant_Pri(self, pri, name, table, option, col):
@@ -99,10 +99,10 @@ class table_Controller:
             sql = sql[:-1]
         if col == '' or pri == 'insert' or pri == 'delete':
             result = execute_query(
-                login_info[0], login_info[1], 'grant {0} on SYS.{1} to {2} {3}'.format(pri, table, name, option))
+                login_info[0], login_info[1], 'grant {0} on {1} to {2} {3}'.format(pri, table, name, option))
         elif (pri == 'select'):
             result = execute_query(
-                login_info[0], login_info[1], 'select view_name from sys.all_views')
+                login_info[0], login_info[1], 'select view_name from all_views')
             count = 0
             while count != 10:
                 for x in result:
@@ -111,12 +111,12 @@ class table_Controller:
                         break
                 count = count + 1
             result = execute_query(
-                login_info[0], login_info[1], 'create view UV_{0}{1} as select {2} from sys.{0}'.format(table, count, sql))
+                login_info[0], login_info[1], 'create view UV_{0}{1} as select {2} from {0}'.format(table, count, sql))
             result = execute_query(
                 login_info[0], login_info[1], 'grant {0} on UV_{0}{1} to {3} {4}'.format(pri, col, table, name, option))
         elif (pri == 'update'):
             result = execute_query(
-                login_info[0], login_info[1], 'grant {0}({1}) on SYS.{2} to {3} {4}'.format(pri, sql, table, name, option))
+                login_info[0], login_info[1], 'grant {0}({1}) on {2} to {3} {4}'.format(pri, sql, table, name, option))
         return result
 
     def get_column_name(self, table):
@@ -148,7 +148,7 @@ class User_Controller:
 
     def display_role_of_user(self, user_name):
         result = execute_query(
-            login_info[0], login_info[1], 'SELECT granted_role, admin_option, delegate_option, default_role, common, inherited FROM SYS.DBA_ROLE_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
+            login_info[0], login_info[1], 'SELECT granted_role, admin_option, delegate_option, default_role, common, inherited FROM DBA_ROLE_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
         return result
 
     def Revoke_Role_From_User(self, role_name, user_name):
@@ -158,7 +158,7 @@ class User_Controller:
 
     def display_tabprivs_of_user(self, user_name):
         result = execute_query(
-            login_info[0], login_info[1], 'SELECT owner, table_name, grantor, privilege, grantable FROM SYS.DBA_TAB_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
+            login_info[0], login_info[1], 'SELECT owner, table_name, grantor, privilege, grantable FROM DBA_TAB_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
         return result
 
     def Revoke_TabPrivs_From_User(self, pri_name, table_name, user_name):
@@ -168,7 +168,7 @@ class User_Controller:
 
     def display_privs_of_user(self, user_name):
         result = execute_query(
-            login_info[0], login_info[1], 'SELECT privilege, admin_option, common, inherited FROM SYS.DBA_SYS_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
+            login_info[0], login_info[1], 'SELECT privilege, admin_option, common, inherited FROM DBA_SYS_PRIVS WHERE grantee = ' + "'{0}'".format(user_name))
         return result
 
     def Revoke_Privs_From_User(self, pri_name, user_name):
@@ -5985,8 +5985,8 @@ class DBA_TableView:
         # Khởi tạo table widget để hiển thị danh sách người dùng
         self.table_widget = QtWidgets.QTableWidget()
         # Đặt số lượng cột cho table widget
-        self.table_widget.setColumnCount(2)
-        self.table_widget.setHorizontalHeaderLabels(['OWNER', 'TABLENAME'])
+        self.table_widget.setColumnCount(1)
+        self.table_widget.setHorizontalHeaderLabels(['TABLENAME'])
 
         self.table_widget.selectionModel().selectionChanged.connect(self.on_selectionChanged)
 
@@ -5997,8 +5997,6 @@ class DBA_TableView:
             self.table_widget.insertRow(row_position)
             self.table_widget.setItem(
                 row_position, 0, QtWidgets.QTableWidgetItem(str(user[0])))
-            self.table_widget.setItem(
-                row_position, 1, QtWidgets.QTableWidgetItem(str(user[1])))
         # Tạo khung cuộn
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -6062,20 +6060,6 @@ class DBA_TableView:
             self.insertOption = False
             self.deleteOption = True
             self.updateOption = False
-
-    def update_user_list(self, search_text=None):
-        self.user_list = self.TableController.get_user_list(search_text)
-        if self.table_widget is not None:
-            self.table_widget.clearContents()
-            self.table_widget.setRowCount(0)
-            self.table_widget.setRowCount(len(self.user_list))
-            for row, user in enumerate(self.user_list):
-                self.table_widget.setItem(
-                    row, 0, QtWidgets.QTableWidgetItem(str(user[0])))
-                self.table_widget.setItem(
-                    row, 1, QtWidgets.QTableWidgetItem(str(user[1])))
-                self.table_widget.setItem(
-                    row, 2, QtWidgets.QTableWidgetItem(str(user[2])))
 
     def clicked_submit(self):
         if self.input.text() == '' or self.noneOption == self.grantOption:
@@ -6160,7 +6144,7 @@ class DBA_TableView:
     def on_selectionChanged(self, selected, deselected):
         for ix in selected.indexes():
             index = int(format(ix.row()))
-            self.table_selected = self.user_list[index][1]
+            self.table_selected = self.user_list[index][0]
 
     def on_selectionChanged_column(self, selected, deselected):
         for ix in selected.indexes():
