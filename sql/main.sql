@@ -354,7 +354,7 @@ create role NHANVIEN;
 
 -- tao view nhan vien xem thong tin ca nhan
 --DROP VIEW CS_NHANVIEN
-CREATE VIEW CS_NHANVIEN AS
+CREATE OR REPLACE VIEW CS_NHANVIEN AS
 SELECT NV.MANV, NV.TENNV, NV.PHAI, NV.NGAYSINH, NV.DIACHI, NV.SODT, NV.LUONG, NV.PHUCAP, NV.VAITRO, NV.MANQL, NV.PHG, PC.MADA, PC.THOIGIAN, NV.USERNAME
 FROM nvquantri.NHANVIEN NV 
 INNER JOIN nvquantri.PHANCONG PC ON NV.MANV = PC.MANV;
@@ -368,7 +368,7 @@ BEGIN
  OBJECT_NAME =>'CS_NHANVIEN',
  POLICY_NAME => 'NhanVien_Policy');
 END;
-
+/
 -- Dinh nghia ham policy
 -- Add policy function to database
 CREATE OR REPLACE FUNCTION NVQuanTri.NhanVien_Condition(
@@ -486,3 +486,43 @@ END;
 /
 EXEC USP_GRANT_PRIVS;
 /
+--4a
+BEGIN
+    dbms_fga.ADD_POLICY (
+        OBJECT_SCHEMA => 'NVQUANTRI',
+        OBJECT_NAME => 'PHANCONG', --Bang Phan cong hoac View Phan cong
+        POLICY_NAME => 'AUDIT_UPDATE_THOIGIAN_PHANCONG',
+        AUDIT_COLUMN => 'THOIGIAN',
+        STATEMENT_TYPES => 'UPDATE',
+        ENABLE => TRUE);
+END;
+/
+--4b
+BEGIN
+    dbms_fga.ADD_POLICY (
+        OBJECT_SCHEMA => 'NVQUANTRI',
+        OBJECT_NAME => 'NHANVIEN',
+        POLICY_NAME => 'AUDIT_SELECT_LUONG_PHUCAP',
+        AUDIT_COLUMN => 'LUONG, PHUCAP',
+        AUDIT_CONDITION => 'USERNAME <> SYS_CONTEXT(''USERENV'',''SESSION_USER'')',
+        STATEMENT_TYPES => 'SELECT',
+        ENABLE => TRUE);
+END;
+/
+--4c
+BEGIN
+    dbms_fga.ADD_POLICY (
+        OBJECT_SCHEMA => 'NVQUANTRI',
+        OBJECT_NAME => 'NHANVIEN',
+        POLICY_NAME => 'AUDIT_UPDATE_LUONG_PHUCAP',
+        AUDIT_COLUMN => 'LUONG, PHUCAP',
+        AUDIT_CONDITION => 'VAITRO <> ''TAICHINH''',
+        STATEMENT_TYPES => 'UPDATE',
+        ENABLE => TRUE);
+END;
+
+/
+select * from nhanvien;
+select * from unified_audit_trail;
+SELECT dbusername, action_name, object_name, event_timestamp FROM unified_audit_trail WHERE OBJECT_SCHEMA='NVQUANTRI' ORDER BY EVENT_TIMESTAMP;
+SELECT dbusername, action_name, object_name, event_timestamp FROM unified_audit_trail WHERE dbusername='NVQUANTRI' ORDER BY EVENT_TIMESTAMP;

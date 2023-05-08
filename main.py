@@ -178,6 +178,7 @@ class User_Controller:
 
 class Audit_Controller:
     def display_user_audit(self, user_name):
+        print('select action_name, object_name, event_timestamp from unified_audit_trail where dbusername =' + "'{0}' order by event_timestamp desc".format(user_name))
         result = execute_query(
             login_info[0], login_info[1], 'select action_name, object_name, event_timestamp from unified_audit_trail where dbusername =' + "'{0}' order by event_timestamp desc".format(user_name))
         return result
@@ -476,7 +477,7 @@ class Taichinh_controller:
         return result
 
     def get_nhanvien_list(self):
-        sql = "SELECT * FROM nvquantri.NHANVIEN"
+        sql = "SELECT * FROM nvquantri.CS_NHANVIEN1"
         result = execute_query(login_info[0], login_info[1], sql)
         return result
 
@@ -3429,8 +3430,6 @@ class TaiChinh_ThongTinNhanVien:
                     row, 9, QtWidgets.QTableWidgetItem(str(user[9])))
                 self.table_widget.setItem(
                     row, 10, QtWidgets.QTableWidgetItem(str(user[10])))
-                self.table_widget.setItem(
-                    row, 11, QtWidgets.QTableWidgetItem(str(user[11])))
 
     def Backmenu(self):
         window_taichinh_ThongTinNhanVien.closeWindow()
